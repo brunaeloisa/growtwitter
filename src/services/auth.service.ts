@@ -8,8 +8,14 @@ export async function login(
 ): Promise<ResponseLogin> {
   try {
     const response = await api.post('/auth/login', { username, password });
+    const { authUser, authToken } = response.data.data;
 
-    return { data: response.data.data };
+    return {
+      data: {
+        user: authUser,
+        token: authToken
+      }
+    };
   } catch (err) {
     if (
       err instanceof AxiosError &&
