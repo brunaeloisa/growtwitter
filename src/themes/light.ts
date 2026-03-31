@@ -28,5 +28,23 @@ export const light = createTheme({
     button: {
       textTransform: 'none'
     }
+  },
+
+  components: {
+    MuiLink: {
+      defaultProps: {
+        underline: 'none'
+      }
+    },
+    MuiButton: {
+      styleOverrides: {
+        contained: {
+          boxShadow: 'none',
+          '&:hover, &:active, &:focus': {
+            boxShadow: 'none'
+          }
+        }
+      }
+    }
   }
 });
