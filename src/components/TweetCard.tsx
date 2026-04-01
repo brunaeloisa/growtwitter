@@ -7,6 +7,7 @@ import ChatBubbleOutlineRoundedIcon from '@mui/icons-material/ChatBubbleOutlineR
 import { likeTweet, unlikeTweet } from '../services/tweet.service';
 import { useState } from 'react';
 import { Link as RouterLink } from 'react-router-dom';
+import TweetModal from './TweetModal';
 
 function formatTimePost(dateString: string) {
   const now = Date.now();
@@ -38,6 +39,7 @@ export function TweetCard({ tweet }: { tweet: Tweet }) {
   const [liked, setLiked] = useState(tweet.likedByUser);
   const [likesCount, setLikesCount] = useState(tweet.likesCount);
   const [loading, setLoading] = useState(false);
+  const [modalOpen, setModalOpen] = useState(false);
 
   const handleLike = async () => {
     if (loading) return;
@@ -117,6 +119,7 @@ export function TweetCard({ tweet }: { tweet: Tweet }) {
           <Stack direction="row" marginTop={0.5} gap={3}>
             {tweet.replies && (
               <Button
+                onClick={() => setModalOpen(true)}
                 sx={{
                   display: 'flex',
                   alignItems: 'center',
@@ -167,6 +170,7 @@ export function TweetCard({ tweet }: { tweet: Tweet }) {
           </Stack>
         </Box>
       </Stack>
+      <TweetModal open={modalOpen} onClose={() => setModalOpen(false)} />
     </>
   );
 }

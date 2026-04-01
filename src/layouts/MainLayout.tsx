@@ -22,11 +22,14 @@ import PersonOutlinedIcon from '@mui/icons-material/PersonOutlineOutlined';
 import PersonIcon from '@mui/icons-material/Person';
 import ProfileDropdown from '../components/ProfileDropdown';
 import { useAppSelector } from '../store/hooks';
+import { useState } from 'react';
+import TweetModal from '../components/TweetModal';
 
 export function MainLayout() {
   const { user, token } = useAppSelector((state) => state.auth);
   const sidebarTopics = topics.slice(0, 5);
   const theme = useTheme();
+  const [modalOpen, setModalOpen] = useState(false);
 
   if (!user || !token) {
     return <Navigate to="/login" replace />;
@@ -96,6 +99,7 @@ export function MainLayout() {
             </Box>
 
             <Button
+              onClick={() => setModalOpen(true)}
               variant="contained"
               color="primary"
               sx={{
@@ -184,6 +188,8 @@ export function MainLayout() {
           </Link>
         </Box>
       </Box>
+
+      <TweetModal open={modalOpen} onClose={() => setModalOpen(false)} />
     </Container>
   );
 }
