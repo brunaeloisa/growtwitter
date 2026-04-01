@@ -44,3 +44,23 @@ export async function getFollowingList(): Promise<string[]> {
     return [];
   }
 }
+
+export async function followUser(userId: string): Promise<boolean> {
+  try {
+    await api.post('/followers', { userId });
+    return true;
+  } catch {
+    console.error(`Erro ao seguir o usuário ${userId}.`);
+    return false;
+  }
+}
+
+export async function unfollowUser(userId: string): Promise<boolean> {
+  try {
+    await api.delete('/followers', { data: { userId } });
+    return true;
+  } catch {
+    console.error(`Erro ao deixar de seguir o usuário ${userId}.`);
+    return false;
+  }
+}

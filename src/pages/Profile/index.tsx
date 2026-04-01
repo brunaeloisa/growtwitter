@@ -1,6 +1,10 @@
 import { useEffect, useState } from 'react';
 import { useAppSelector } from '../../store/hooks';
-import { getUserProfileById } from '../../services/user.service';
+import {
+  followUser,
+  getUserProfileById,
+  unfollowUser
+} from '../../services/user.service';
 import { useParams } from 'react-router-dom';
 import type { UserProfile } from '../../types/user.types';
 import {
@@ -39,6 +43,7 @@ export function Profile() {
   const loggedUser = useAppSelector((state) => state.auth.user);
   const { id: userId } = useParams<{ id: string }>();
   const [loading, setLoading] = useState(true);
+  const [loadingFollow, setLoadingFollow] = useState(false);
   const [user, setUser] = useState<UserProfile | null>(null);
   const { followingList, setFollowingList } = useOutletContext<OutletContext>();
 
@@ -53,14 +58,31 @@ export function Profile() {
       .finally(() => setLoading(false));
   }, [userId, loggedUser?.id]);
 
-  function handleFollow() {
-    if (!userId) return;
+  async function handleFollow() {
+    if (!userId || loadingFollow) return;
+
+    setLoadingFollow(true);
+
+    const wasFollowing = isFollowing;
 
     setFollowingList(
-      isFollowing
+      wasFollowing
         ? followingList.filter((id) => id !== userId)
         : [...followingList, userId]
     );
+
+    const success = wasFollowing
+      ? await unfollowUser(userId)
+      : await followUser(userId);
+
+    if (!success)
+      setFollowingList(
+        wasFollowing
+          ? [...followingList, userId]
+          : followingList.filter((id) => id !== userId)
+      );
+
+    setLoadingFollow(false);
   }
 
   if (loading) {
