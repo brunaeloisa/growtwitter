@@ -1,9 +1,4 @@
-export interface User {
-  id: string;
-  username: string;
-  name: string;
-  imageUrl?: string;
-}
+import type { User, UserBackend } from './user.types';
 
 export interface Tweet {
   id: string;
@@ -16,13 +11,8 @@ export interface Tweet {
   replies?: Tweet[];
 }
 
-export interface AuthorBackend extends User {
-  createdAt: string;
-  updatedAt: string;
-}
-
-export interface LikeBackend {
-  author: AuthorBackend;
+interface LikeBackend {
+  author: UserBackend;
   createdAt: string;
   updatedAt: string;
 }
@@ -33,7 +23,7 @@ export interface TweetBackend {
   type: 'REPLY' | 'NORMAL';
   createdAt: string;
   updatedAt: string;
-  author: AuthorBackend;
+  author: UserBackend;
   likes: LikeBackend[];
   replies?: TweetBackend[];
 }

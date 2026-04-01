@@ -78,8 +78,17 @@ export default function ProfileDropdown({
             '&:hover': { backgroundColor: 'background.paper' }
           }}
         >
-          <Avatar src={imageUrl ?? undefined} sx={{ width: 30, height: 30 }}>
-            <CropOriginalIcon sx={{ color: '#ffffff' }} />
+          <Avatar
+            src={imageUrl ?? undefined}
+            sx={{
+              width: 30,
+              height: 30,
+              '& img': {
+                bgcolor: 'background.paper'
+              }
+            }}
+          >
+            <CropOriginalIcon fontSize="small" sx={{ color: '#ffffff' }} />
           </Avatar>
 
           <Box sx={{ overflow: 'hidden', flex: 1 }}>

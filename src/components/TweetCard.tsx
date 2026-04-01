@@ -65,7 +65,13 @@ export function TweetCard({ tweet }: { tweet: Tweet }) {
       <Stack direction="row" gap={1} sx={{ p: 1 }}>
         <Avatar
           src={tweet.author.imageUrl ?? undefined}
-          sx={{ width: 40, height: 40, bgcolor: 'background.paper' }}
+          sx={{
+            width: 40,
+            height: 40,
+            '& img': {
+              bgcolor: 'background.paper'
+            }
+          }}
         >
           <CropOriginalIcon sx={{ color: '#ffffff' }} />
         </Avatar>

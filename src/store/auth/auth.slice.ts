@@ -1,11 +1,11 @@
 import { createSlice } from '@reduxjs/toolkit';
-import type { AuthUser } from '../../types/auth.types';
+import type { User } from '../../types/user.types';
 import storage from 'redux-persist/es/storage';
 import { persistReducer } from 'redux-persist';
 import { loginThunk } from './auth.thunk';
 
 type UserState = {
-  user: AuthUser | null;
+  user: User | null;
   token: string | null;
   loading: boolean;
   error: string | null;

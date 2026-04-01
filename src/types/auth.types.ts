@@ -1,12 +1,7 @@
-export interface AuthUser {
-  id: string;
-  name: string;
-  username: string;
-  imageUrl?: string | null;
-}
+import type { User } from './user.types';
 
 interface LoginData {
-  user: AuthUser;
+  user: User;
   token: string;
 }
 
