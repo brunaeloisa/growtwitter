@@ -71,3 +71,26 @@ export async function unlikeTweet(tweetId: string): Promise<boolean> {
     return false;
   }
 }
+
+export async function postTweet(content: string): Promise<boolean> {
+  try {
+    await api.post('/tweets', { content });
+    return true;
+  } catch {
+    console.error('Erro ao enviar growtweet.');
+    return false;
+  }
+}
+
+export async function postReply(
+  content: string,
+  replyTo: string
+): Promise<boolean> {
+  try {
+    await api.post('/replies', { content, replyTo });
+    return true;
+  } catch {
+    console.error('Erro ao enviar growtweet.');
+    return false;
+  }
+}

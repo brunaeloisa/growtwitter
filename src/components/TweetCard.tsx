@@ -40,6 +40,7 @@ export function TweetCard({ tweet }: { tweet: Tweet }) {
   const [likesCount, setLikesCount] = useState(tweet.likesCount);
   const [loading, setLoading] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
+  const [replyToTweetId, setReplyToTweetId] = useState('');
 
   const handleLike = async () => {
     if (loading) return;
@@ -119,7 +120,10 @@ export function TweetCard({ tweet }: { tweet: Tweet }) {
           <Stack direction="row" marginTop={0.5} gap={3}>
             {tweet.replies && (
               <Button
-                onClick={() => setModalOpen(true)}
+                onClick={() => {
+                  setReplyToTweetId(tweet.id);
+                  setModalOpen(true);
+                }}
                 sx={{
                   display: 'flex',
                   alignItems: 'center',
@@ -170,7 +174,13 @@ export function TweetCard({ tweet }: { tweet: Tweet }) {
           </Stack>
         </Box>
       </Stack>
-      <TweetModal open={modalOpen} onClose={() => setModalOpen(false)} />
+
+      <TweetModal
+        open={modalOpen}
+        onClose={() => setModalOpen(false)}
+        mode="REPLY"
+        replyTo={replyToTweetId}
+      />
     </>
   );
 }

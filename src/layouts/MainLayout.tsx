@@ -189,7 +189,11 @@ export function MainLayout() {
         </Box>
       </Box>
 
-      <TweetModal open={modalOpen} onClose={() => setModalOpen(false)} />
+      <TweetModal
+        mode="NORMAL"
+        open={modalOpen}
+        onClose={() => setModalOpen(false)}
+      />
     </Container>
   );
 }
