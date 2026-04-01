@@ -1,4 +1,4 @@
-import { Avatar, Box, Button, Stack, Typography } from '@mui/material';
+import { Avatar, Box, Button, Stack, Typography, Link } from '@mui/material';
 import type { Tweet } from '../types/tweet.types';
 import CropOriginalIcon from '@mui/icons-material/CropOriginal';
 import FavoriteIcon from '@mui/icons-material/Favorite';
@@ -6,6 +6,7 @@ import FavoriteBorderIcon from '@mui/icons-material/FavoriteBorder';
 import ChatBubbleOutlineRoundedIcon from '@mui/icons-material/ChatBubbleOutlineRounded';
 import { likeTweet, unlikeTweet } from '../services/tweet.service';
 import { useState } from 'react';
+import { Link as RouterLink } from 'react-router-dom';
 
 function formatTimePost(dateString: string) {
   const now = Date.now();
@@ -63,37 +64,51 @@ export function TweetCard({ tweet }: { tweet: Tweet }) {
   return (
     <>
       <Stack direction="row" gap={1} sx={{ p: 1 }}>
-        <Avatar
-          src={tweet.author.imageUrl ?? undefined}
-          sx={{
-            width: 40,
-            height: 40,
-            '& img': {
-              bgcolor: 'background.paper'
-            }
-          }}
+        <Link
+          component={RouterLink}
+          to={`/profile/${tweet.author.id}`}
+          underline="none"
+          color="inherit"
         >
-          <CropOriginalIcon sx={{ color: '#ffffff' }} />
-        </Avatar>
+          <Avatar
+            src={tweet.author.imageUrl ?? undefined}
+            sx={{
+              width: 40,
+              height: 40,
+              '& img': {
+                bgcolor: 'background.paper'
+              }
+            }}
+          >
+            <CropOriginalIcon sx={{ color: '#ffffff' }} />
+          </Avatar>
+        </Link>
 
         <Box>
-          <Box sx={{ display: 'flex', gap: 0.5 }}>
-            <Typography variant="caption" fontWeight={800}>
-              {tweet.author.name}
-            </Typography>
+          <Link
+            component={RouterLink}
+            to={`/profile/${tweet.author.id}`}
+            underline="none"
+            color="inherit"
+          >
+            <Box sx={{ display: 'flex', gap: 0.5 }}>
+              <Typography variant="caption" fontWeight={800}>
+                {tweet.author.name}
+              </Typography>
 
-            <Typography
-              variant="caption"
-              fontWeight={500}
-              color="text.disabled"
-            >
-              @{tweet.author.username}
-            </Typography>
+              <Typography
+                variant="caption"
+                fontWeight={500}
+                color="text.disabled"
+              >
+                @{tweet.author.username}
+              </Typography>
 
-            <Typography variant="caption" color="text.disabled">
-              • {formatTimePost(tweet.createdAt)}
-            </Typography>
-          </Box>
+              <Typography variant="caption" color="text.disabled">
+                • {formatTimePost(tweet.createdAt)}
+              </Typography>
+            </Box>
+          </Link>
 
           <Typography variant="caption" color="text.secondary" component="div">
             {tweet.content}
