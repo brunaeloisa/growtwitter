@@ -43,7 +43,8 @@ export function MainLayout() {
         maxWidth: 1000,
         display: 'flex',
         mx: 'auto',
-        minHeight: '100vh'
+        height: '100vh',
+        overflow: 'hidden'
       }}
     >
       <Box
@@ -52,7 +53,8 @@ export function MainLayout() {
           width: 200,
           p: 1,
           position: 'sticky',
-          top: 0
+          top: 0,
+          height: '100%'
         }}
       >
         <Stack
@@ -127,7 +129,9 @@ export function MainLayout() {
           flex: 1,
           borderLeft: 1,
           borderRight: 1,
-          borderColor: 'divider'
+          borderColor: 'divider',
+          overflow: 'auto',
+          height: '100%'
         }}
       >
         <Outlet />
