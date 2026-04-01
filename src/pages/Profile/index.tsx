@@ -17,6 +17,12 @@ import KeyboardBackspaceIcon from '@mui/icons-material/KeyboardBackspace';
 import CropOriginalIcon from '@mui/icons-material/CropOriginal';
 import CalendarMonthOutlinedIcon from '@mui/icons-material/CalendarMonthOutlined';
 import { Link as RouterLink } from 'react-router-dom';
+import { useOutletContext } from 'react-router-dom';
+
+interface OutletContext {
+  followingList: string[];
+  setFollowingList: React.Dispatch<React.SetStateAction<string[]>>;
+}
 
 function formatAccountCreationDate(dateString: string) {
   const date = new Date(dateString);
@@ -34,6 +40,10 @@ export function Profile() {
   const { id: userId } = useParams<{ id: string }>();
   const [loading, setLoading] = useState(true);
   const [user, setUser] = useState<UserProfile | null>(null);
+  const { followingList, setFollowingList } = useOutletContext<OutletContext>();
+
+  const isOwnProfile = loggedUser?.id === userId;
+  const isFollowing = !isOwnProfile && followingList?.includes(userId || '');
 
   useEffect(() => {
     if (!loggedUser?.id || !userId) return;
@@ -42,6 +52,16 @@ export function Profile() {
       .then(setUser)
       .finally(() => setLoading(false));
   }, [userId, loggedUser?.id]);
+
+  function handleFollow() {
+    if (!userId) return;
+
+    setFollowingList(
+      isFollowing
+        ? followingList.filter((id) => id !== userId)
+        : [...followingList, userId]
+    );
+  }
 
   if (loading) {
     return (
@@ -135,21 +155,39 @@ export function Profile() {
               </Typography>
             </Box>
 
-            {userId !== loggedUser?.id && (
+            {!isOwnProfile && (
               <Button
-                variant="contained"
+                onClick={handleFollow}
+                aria-label={
+                  isFollowing
+                    ? `Deixar de seguir @${user?.username}`
+                    : `Seguir  @${user?.username}`
+                }
+                variant={isFollowing ? 'outlined' : 'contained'}
                 sx={{
                   height: 32,
                   borderRadius: 5,
-                  backgroundColor: 'text.primary',
-                  color: 'background.default',
                   fontWeight: 600,
-                  '&:hover': {
-                    backgroundColor: 'text.secondary'
-                  }
+                  transition: 'border-color 0.2s ease, color 0.2s ease',
+                  ...(isFollowing
+                    ? {
+                        borderColor: 'text.primary',
+                        color: 'text.primary',
+                        '&:hover': {
+                          borderColor: 'error.main',
+                          color: 'error.main'
+                        }
+                      }
+                    : {
+                        backgroundColor: 'text.primary',
+                        color: 'background.default',
+                        '&:hover': {
+                          backgroundColor: 'text.secondary'
+                        }
+                      })
                 }}
               >
-                Seguir
+                {isFollowing ? 'Seguindo' : 'Seguir'}
               </Button>
             )}
           </Stack>

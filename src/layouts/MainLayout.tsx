@@ -22,14 +22,20 @@ import PersonOutlinedIcon from '@mui/icons-material/PersonOutlineOutlined';
 import PersonIcon from '@mui/icons-material/Person';
 import ProfileDropdown from '../components/ProfileDropdown';
 import { useAppSelector } from '../store/hooks';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import TweetModal from '../components/TweetModal';
+import { getFollowingList } from '../services/user.service';
 
 export function MainLayout() {
   const { user, token } = useAppSelector((state) => state.auth);
   const sidebarTopics = topics.slice(0, 5);
   const theme = useTheme();
   const [modalOpen, setModalOpen] = useState(false);
+  const [followingList, setFollowingList] = useState<string[]>([]);
+
+  useEffect(() => {
+    getFollowingList().then(setFollowingList);
+  }, []);
 
   if (!user || !token) {
     return <Navigate to="/login" replace />;
@@ -134,7 +140,7 @@ export function MainLayout() {
           height: '100%'
         }}
       >
-        <Outlet />
+        <Outlet context={{ followingList, setFollowingList }} />
       </Box>
 
       <Box

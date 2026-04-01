@@ -1,5 +1,5 @@
 import { AxiosError } from 'axios';
-import type { UserProfile } from '../types/user.types';
+import type { UserBackend, UserProfile } from '../types/user.types';
 import { api } from './api.service';
 import { normalizeTweets } from './tweet.service';
 import type { TweetBackend } from '../types/tweet.types';
@@ -32,5 +32,15 @@ export async function getUserProfileById(
       console.error(err);
     }
     return null;
+  }
+}
+
+export async function getFollowingList(): Promise<string[]> {
+  try {
+    const response = await api.get('/followers');
+    return response.data.data.followings.map((user: UserBackend) => user.id);
+  } catch {
+    console.error('Erro ao carregar lista de usuários seguidos.');
+    return [];
   }
 }
