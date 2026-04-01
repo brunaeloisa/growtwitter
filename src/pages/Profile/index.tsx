@@ -12,7 +12,7 @@ import {
   Avatar,
   Button
 } from '@mui/material';
-import { TweetThread } from '../../components/TweetThread';
+import { TweetCard } from '../../components/TweetCard';
 import KeyboardBackspaceIcon from '@mui/icons-material/KeyboardBackspace';
 import CropOriginalIcon from '@mui/icons-material/CropOriginal';
 import CalendarMonthOutlinedIcon from '@mui/icons-material/CalendarMonthOutlined';
@@ -210,7 +210,7 @@ export function Profile() {
       >
         {user?.tweets.length ? (
           user?.tweets.map((tweet) => (
-            <TweetThread key={tweet.id} tweet={tweet} />
+            <TweetCard key={tweet.id} tweet={tweet} />
           ))
         ) : (
           <Typography variant="caption" sx={{ p: 2, textAlign: 'center' }}>
