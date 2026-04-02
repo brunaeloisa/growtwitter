@@ -39,7 +39,7 @@ export default function TweetModalButton({
 
     const success =
       mode === 'REPLY' && replyTo
-        ? await postReply(tweetContent, '')
+        ? await postReply(tweetContent, replyTo)
         : await postTweet(tweetContent);
 
     setLoading(false);
