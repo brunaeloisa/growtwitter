@@ -14,6 +14,7 @@ import { postReply, postTweet } from '../services/tweet.service';
 interface TweetModalProps {
   open: boolean;
   onClose: () => void;
+  onTweetCreated: () => void;
   mode: 'NORMAL' | 'REPLY';
   replyTo?: string;
 }
@@ -21,6 +22,7 @@ interface TweetModalProps {
 export default function TweetModalButton({
   open,
   onClose,
+  onTweetCreated,
   mode,
   replyTo
 }: TweetModalProps) {
@@ -51,7 +53,7 @@ export default function TweetModalButton({
         severity: 'success'
       });
       setTweetContent('');
-      onClose();
+      onTweetCreated();
     } else {
       setSnackbar({
         open: true,
@@ -68,7 +70,7 @@ export default function TweetModalButton({
         <Modal
           open={open}
           onClose={onClose}
-          aria-labelledby="tweet-modal-title"
+          aria-label={mode === 'REPLY' ? 'Responder Tweet' : 'Tweetar'}
         >
           <Box
             sx={{
@@ -81,7 +83,7 @@ export default function TweetModalButton({
               backgroundColor: 'background.paper',
               borderRadius: 2,
               boxShadow: 24,
-              p: 2,
+              py: 2,
               px: 3
             }}
           >

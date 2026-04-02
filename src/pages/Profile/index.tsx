@@ -23,11 +23,6 @@ import CalendarMonthOutlinedIcon from '@mui/icons-material/CalendarMonthOutlined
 import { Link as RouterLink } from 'react-router-dom';
 import { useOutletContext } from 'react-router-dom';
 
-interface OutletContext {
-  followingList: string[];
-  setFollowingList: React.Dispatch<React.SetStateAction<string[]>>;
-}
-
 function formatAccountCreationDate(dateString: string) {
   const date = new Date(dateString);
 
@@ -39,13 +34,20 @@ function formatAccountCreationDate(dateString: string) {
   return date.toLocaleDateString('pt-BR', options);
 }
 
+interface OutletContext {
+  followingList: string[];
+  setFollowingList: React.Dispatch<React.SetStateAction<string[]>>;
+  profileRefreshKey: number;
+}
+
 export function Profile() {
   const loggedUser = useAppSelector((state) => state.auth.user);
   const { id: userId } = useParams<{ id: string }>();
   const [loading, setLoading] = useState(true);
   const [loadingFollow, setLoadingFollow] = useState(false);
   const [user, setUser] = useState<UserProfile | null>(null);
-  const { followingList, setFollowingList } = useOutletContext<OutletContext>();
+  const { followingList, setFollowingList, profileRefreshKey } =
+    useOutletContext<OutletContext>();
 
   const isOwnProfile = loggedUser?.id === userId;
   const isFollowing = !isOwnProfile && followingList?.includes(userId || '');
@@ -60,7 +62,7 @@ export function Profile() {
 
   useEffect(() => {
     loadProfile();
-  }, [loadProfile]);
+  }, [loadProfile, profileRefreshKey]);
 
   async function handleFollow() {
     if (!userId || loadingFollow) return;
@@ -89,7 +91,7 @@ export function Profile() {
     setLoadingFollow(false);
   }
 
-  if (loading) {
+  if (loading && !user) {
     return (
       <Typography variant="body2" sx={{ p: 1.5, textAlign: 'center' }}>
         Carregando...

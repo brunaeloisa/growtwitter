@@ -49,9 +49,10 @@ function formatTimePost(dateString: string) {
 export interface TweetCardProps {
   tweet: Tweet;
   onDelete: () => void;
+  triggerRefresh?: () => void;
 }
 
-export function TweetCard({ tweet, onDelete }: TweetCardProps) {
+export function TweetCard({ tweet, onDelete, triggerRefresh }: TweetCardProps) {
   const [liked, setLiked] = useState(tweet.likedByUser);
   const [likesCount, setLikesCount] = useState(tweet.likesCount);
   const [loading, setLoading] = useState(false);
@@ -110,6 +111,14 @@ export function TweetCard({ tweet, onDelete }: TweetCardProps) {
       });
     }
   }
+
+  const handleTweetCreated = () => {
+    if (location.pathname === '/' && triggerRefresh) {
+      triggerRefresh();
+    }
+
+    setModalOpen(false);
+  };
 
   return (
     <>
@@ -222,6 +231,7 @@ export function TweetCard({ tweet, onDelete }: TweetCardProps) {
       <TweetModal
         open={modalOpen}
         onClose={() => setModalOpen(false)}
+        onTweetCreated={handleTweetCreated}
         mode="REPLY"
         replyTo={replyToTweetId}
       />

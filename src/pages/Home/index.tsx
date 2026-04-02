@@ -9,6 +9,7 @@ export function Home() {
   const { user } = useAppSelector((state) => state.auth);
   const [loading, setLoading] = useState(true);
   const [tweets, setTweets] = useState<Tweet[]>([]);
+  const [feedRefreshKey, setFeedRefreshKey] = useState(0);
 
   const loadTweets = useCallback(async () => {
     if (!user?.id) return;
@@ -20,7 +21,7 @@ export function Home() {
 
   useEffect(() => {
     loadTweets();
-  }, [loadTweets]);
+  }, [loadTweets, feedRefreshKey]);
 
   return (
     <>
@@ -48,13 +49,18 @@ export function Home() {
           />
         }
       >
-        {loading ? (
+        {loading && tweets.length === 0 ? (
           <Typography variant="body2" sx={{ p: 1.5, textAlign: 'center' }}>
             Carregando...
           </Typography>
         ) : tweets.length ? (
           tweets.map((tweet) => (
-            <TweetThread key={tweet.id} tweet={tweet} onDelete={loadTweets} />
+            <TweetThread
+              key={tweet.id}
+              tweet={tweet}
+              onDelete={loadTweets}
+              triggerRefresh={() => setFeedRefreshKey((prev) => prev + 1)}
+            />
           ))
         ) : (
           <Typography variant="body2" sx={{ p: 1.5, textAlign: 'center' }}>

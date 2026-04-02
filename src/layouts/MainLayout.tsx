@@ -32,10 +32,19 @@ export function MainLayout() {
   const theme = useTheme();
   const [modalOpen, setModalOpen] = useState(false);
   const [followingList, setFollowingList] = useState<string[]>([]);
+  const [profileRefreshKey, setProfileRefreshKey] = useState(0);
 
   useEffect(() => {
     getFollowingList().then(setFollowingList);
   }, []);
+
+  const handleTweetCreated = () => {
+    if (location.pathname === `/profile/${user?.id}`) {
+      setProfileRefreshKey((prev) => prev + 1);
+    }
+
+    setModalOpen(false);
+  };
 
   if (!user || !token) {
     return <Navigate to="/login" replace />;
@@ -140,7 +149,9 @@ export function MainLayout() {
           height: '100%'
         }}
       >
-        <Outlet context={{ followingList, setFollowingList }} />
+        <Outlet
+          context={{ profileRefreshKey, followingList, setFollowingList }}
+        />
       </Box>
 
       <Box
@@ -203,6 +214,7 @@ export function MainLayout() {
         mode="NORMAL"
         open={modalOpen}
         onClose={() => setModalOpen(false)}
+        onTweetCreated={handleTweetCreated}
       />
     </Container>
   );

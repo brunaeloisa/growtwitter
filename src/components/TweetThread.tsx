@@ -12,17 +12,29 @@ const ThreadLine = styled('div')(({ theme }) => ({
   borderRadius: 2
 }));
 
-export function TweetThread({ tweet, onDelete }: TweetCardProps) {
+export function TweetThread({
+  tweet,
+  onDelete,
+  triggerRefresh
+}: TweetCardProps) {
   return (
     <Stack>
       <Box position="relative">
-        <TweetCard tweet={tweet} onDelete={onDelete} />
+        <TweetCard
+          tweet={tweet}
+          onDelete={onDelete}
+          triggerRefresh={triggerRefresh}
+        />
         {tweet.replies && tweet.replies.length > 0 && <ThreadLine />}
       </Box>
 
       {(tweet.replies || []).map((reply, index) => (
         <Box key={reply.id} position="relative">
-          <TweetCard tweet={reply} onDelete={onDelete} />
+          <TweetCard
+            tweet={reply}
+            onDelete={onDelete}
+            triggerRefresh={triggerRefresh}
+          />
           {index < (tweet.replies?.length ?? 0) - 1 && <ThreadLine />}
         </Box>
       ))}
