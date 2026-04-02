@@ -17,7 +17,7 @@ export function normalizeTweets(
       imageUrl: tweet.author.imageUrl
     },
     createdAt: tweet.createdAt,
-    likesCount: tweet.likes.length,
+    likeCount: tweet.likes.length,
     likedByUser: tweet.likes.some((like) => like.author.id === currentUserId),
     replies: (tweet.replies || []).map((reply) => ({
       id: reply.id,
@@ -30,7 +30,7 @@ export function normalizeTweets(
         username: reply.author.username,
         imageUrl: reply.author.imageUrl
       },
-      likesCount: reply.likes.length,
+      likeCount: reply.likes.length,
       likedByUser: reply.likes.some((like) => like.author.id === currentUserId)
     }))
   }));

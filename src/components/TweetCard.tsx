@@ -54,9 +54,10 @@ export interface TweetCardProps {
 
 export function TweetCard({ tweet, onDelete, triggerRefresh }: TweetCardProps) {
   const [liked, setLiked] = useState(tweet.likedByUser);
-  const [likesCount, setLikesCount] = useState(tweet.likesCount);
+  const [likeCount, setLikeCount] = useState(tweet.likeCount);
   const [loading, setLoading] = useState(false);
   const [modalOpen, setModalOpen] = useState(false);
+  const [replyDelta, setReplyDelta] = useState(0);
   const [replyToTweetId, setReplyToTweetId] = useState('');
   const [snackbar, setSnackbar] = useState({
     open: false,
@@ -65,6 +66,7 @@ export function TweetCard({ tweet, onDelete, triggerRefresh }: TweetCardProps) {
 
   const loggedUser = useAppSelector((state) => state.auth.user);
   const isAuthor = tweet.author.id === loggedUser?.id;
+  const replyCount = (tweet.replies?.length ?? 0) + replyDelta;
 
   const actionButtonStyle = {
     display: 'flex',
@@ -81,10 +83,10 @@ export function TweetCard({ tweet, onDelete, triggerRefresh }: TweetCardProps) {
 
     setLoading(true);
 
-    const prevCount = likesCount;
+    const prevCount = likeCount;
 
     setLiked(!liked);
-    setLikesCount((prev: number) => (liked ? prev - 1 : prev + 1));
+    setLikeCount((prev: number) => (liked ? prev - 1 : prev + 1));
 
     const success = liked
       ? await unlikeTweet(tweet.id)
@@ -92,7 +94,7 @@ export function TweetCard({ tweet, onDelete, triggerRefresh }: TweetCardProps) {
 
     if (!success) {
       setLiked(!liked);
-      setLikesCount(prevCount);
+      setLikeCount(prevCount);
     }
 
     setLoading(false);
@@ -115,6 +117,8 @@ export function TweetCard({ tweet, onDelete, triggerRefresh }: TweetCardProps) {
   const handleTweetCreated = () => {
     if (location.pathname === '/' && triggerRefresh) {
       triggerRefresh();
+    } else {
+      setReplyDelta((prev) => prev + 1);
     }
 
     setModalOpen(false);
@@ -185,9 +189,7 @@ export function TweetCard({ tweet, onDelete, triggerRefresh }: TweetCardProps) {
                   }}
                 >
                   <ChatBubbleOutlineRoundedIcon sx={{ fontSize: 14 }} />
-                  <Typography variant="caption">
-                    {tweet.replies.length ?? 0}
-                  </Typography>
+                  <Typography variant="caption">{replyCount}</Typography>
                 </Button>
               </Box>
             )}
@@ -208,7 +210,7 @@ export function TweetCard({ tweet, onDelete, triggerRefresh }: TweetCardProps) {
                 )}
 
                 <Typography variant="caption" color="inherit">
-                  {likesCount}
+                  {likeCount}
                 </Typography>
               </Button>
             </Box>

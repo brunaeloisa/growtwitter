@@ -4,7 +4,7 @@ export interface Tweet {
   id: string;
   author: User;
   content: string;
-  likesCount: number;
+  likeCount: number;
   likedByUser: boolean;
   createdAt: string;
   type: 'NORMAL' | 'REPLY';
