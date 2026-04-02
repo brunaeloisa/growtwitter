@@ -1,5 +1,5 @@
 import { Divider, Stack, Typography } from '@mui/material';
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { fetchFeed } from '../../services/tweet.service';
 import { useAppSelector } from '../../store/hooks';
 import type { Tweet } from '../../types/tweet.types';
@@ -10,13 +10,17 @@ export function Home() {
   const [loading, setLoading] = useState(true);
   const [tweets, setTweets] = useState<Tweet[]>([]);
 
-  useEffect(() => {
+  const loadTweets = useCallback(async () => {
     if (!user?.id) return;
 
     fetchFeed(user.id)
       .then(setTweets)
       .finally(() => setLoading(false));
-  }, [user?.id]);
+  }, [user]);
+
+  useEffect(() => {
+    loadTweets();
+  }, [loadTweets]);
 
   return (
     <>
@@ -49,7 +53,9 @@ export function Home() {
             Carregando...
           </Typography>
         ) : tweets.length ? (
-          tweets.map((tweet) => <TweetThread key={tweet.id} tweet={tweet} />)
+          tweets.map((tweet) => (
+            <TweetThread key={tweet.id} tweet={tweet} onDelete={loadTweets} />
+          ))
         ) : (
           <Typography variant="body2" sx={{ p: 1.5, textAlign: 'center' }}>
             Nada por aqui ainda. Siga pessoas para ver growtweets no seu feed!

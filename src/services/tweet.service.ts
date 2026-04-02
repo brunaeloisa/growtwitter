@@ -94,3 +94,13 @@ export async function postReply(
     return false;
   }
 }
+
+export async function deleteTweet(tweetId: string): Promise<boolean> {
+  try {
+    await api.delete(`/tweets/${tweetId}`);
+    return true;
+  } catch {
+    console.error('Erro ao excluir growtweet.');
+    return false;
+  }
+}

@@ -1,6 +1,5 @@
 import { Box, Stack, styled } from '@mui/material';
-import { TweetCard } from './TweetCard';
-import type { Tweet } from '../types/tweet.types';
+import { TweetCard, type TweetCardProps } from './TweetCard';
 
 const ThreadLine = styled('div')(({ theme }) => ({
   position: 'absolute',
@@ -13,17 +12,17 @@ const ThreadLine = styled('div')(({ theme }) => ({
   borderRadius: 2
 }));
 
-export function TweetThread({ tweet }: { tweet: Tweet }) {
+export function TweetThread({ tweet, onDelete }: TweetCardProps) {
   return (
     <Stack>
       <Box position="relative">
-        <TweetCard tweet={tweet} />
+        <TweetCard tweet={tweet} onDelete={onDelete} />
         {tweet.replies && tweet.replies.length > 0 && <ThreadLine />}
       </Box>
 
       {(tweet.replies || []).map((reply, index) => (
         <Box key={reply.id} position="relative">
-          <TweetCard tweet={reply} />
+          <TweetCard tweet={reply} onDelete={onDelete} />
           {index < (tweet.replies?.length ?? 0) - 1 && <ThreadLine />}
         </Box>
       ))}

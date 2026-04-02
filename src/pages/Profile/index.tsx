@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useAppSelector } from '../../store/hooks';
 import {
   followUser,
@@ -50,13 +50,17 @@ export function Profile() {
   const isOwnProfile = loggedUser?.id === userId;
   const isFollowing = !isOwnProfile && followingList?.includes(userId || '');
 
-  useEffect(() => {
+  const loadProfile = useCallback(() => {
     if (!loggedUser?.id || !userId) return;
 
     getUserProfileById(userId, loggedUser.id)
       .then(setUser)
       .finally(() => setLoading(false));
-  }, [userId, loggedUser?.id]);
+  }, [userId, loggedUser]);
+
+  useEffect(() => {
+    loadProfile();
+  }, [loadProfile]);
 
   async function handleFollow() {
     if (!userId || loadingFollow) return;
@@ -270,7 +274,7 @@ export function Profile() {
       >
         {user?.tweets.length ? (
           user?.tweets.map((tweet) => (
-            <TweetCard key={tweet.id} tweet={tweet} />
+            <TweetCard key={tweet.id} tweet={tweet} onDelete={loadProfile} />
           ))
         ) : (
           <Typography variant="caption" sx={{ p: 2, textAlign: 'center' }}>
