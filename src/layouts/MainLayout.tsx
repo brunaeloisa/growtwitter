@@ -1,36 +1,27 @@
-import { Navigate, Outlet } from 'react-router-dom';
 import {
   Box,
   Container,
+  Drawer,
+  IconButton,
   Link,
-  Typography,
-  Stack,
-  MenuList,
-  Button
+  Typography
 } from '@mui/material';
-import { Link as RouterLink } from 'react-router-dom';
-import { TrendingTopic } from '../components/TrendingTopic';
-import { topics } from '../data/trendingTopics';
-import logoDark from '../assets/logo-dark.svg';
-import logoLight from '../assets/logo-light.svg';
-import { useTheme } from '@mui/material/styles';
-import HomeIcon from '@mui/icons-material/Home';
-import HomeOutlinedIcon from '@mui/icons-material/HomeOutlined';
-import { NavMenuItem } from '../components/NavMenuItem';
-import TagIcon from '@mui/icons-material/Tag';
-import PersonOutlinedIcon from '@mui/icons-material/PersonOutlineOutlined';
-import PersonIcon from '@mui/icons-material/Person';
-import ProfileDropdown from '../components/ProfileDropdown';
-import { useAppSelector } from '../store/hooks';
 import { useEffect, useState } from 'react';
+import { Navigate, Outlet, Link as RouterLink } from 'react-router-dom';
+import { Sidebar } from '../components/Sidebar';
+import { TrendingTopic } from '../components/TrendingTopic';
 import TweetModal from '../components/TweetModal';
+import { topics } from '../data/trendingTopics';
 import { getFollowingList } from '../services/user.service';
+import { useAppSelector } from '../store/hooks';
+import MenuIcon from '@mui/icons-material/Menu';
 
 export function MainLayout() {
   const { user, token } = useAppSelector((state) => state.auth);
   const sidebarTopics = topics.slice(0, 5);
-  const theme = useTheme();
   const [modalOpen, setModalOpen] = useState(false);
+  const [openMenu, setOpenMenu] = useState(false);
+
   const [followingList, setFollowingList] = useState<string[]>([]);
   const [profileRefreshKey, setProfileRefreshKey] = useState(0);
 
@@ -38,13 +29,17 @@ export function MainLayout() {
     getFollowingList().then(setFollowingList);
   }, []);
 
-  const handleTweetCreated = () => {
+  function handleTweetCreated() {
     if (location.pathname === `/profile/${user?.id}`) {
       setProfileRefreshKey((prev) => prev + 1);
     }
 
     setModalOpen(false);
-  };
+  }
+
+  function toggleDrawer(newOpen: boolean) {
+    return () => setOpenMenu(newOpen);
+  }
 
   if (!user || !token) {
     return <Navigate to="/login" replace />;
@@ -62,80 +57,34 @@ export function MainLayout() {
         overflow: 'hidden'
       }}
     >
-      <Box
-        component="aside"
+      <IconButton
+        aria-label="Abrir menu"
+        onClick={toggleDrawer(true)}
         sx={{
-          width: 200,
-          p: 1,
-          position: 'sticky',
-          top: 0,
-          height: '100%'
+          display: { xs: 'inline-flex', md: 'none' },
+          position: 'absolute',
+          top: 8,
+          right: 8,
+          zIndex: 30
         }}
       >
-        <Stack
-          direction="column"
-          justifyContent="space-between"
-          sx={{ height: '100%' }}
-        >
-          <Box sx={{ pr: 1 }}>
-            <Box sx={{ pt: 1, pl: 1.5, display: 'block' }}>
-              <img
-                src={theme.palette.mode === 'dark' ? logoDark : logoLight}
-                alt="growtweet"
-                height={16}
-              />
-            </Box>
-            <Box component="nav">
-              <MenuList sx={{ py: 0.5 }}>
-                <NavMenuItem
-                  to="/"
-                  icon={HomeOutlinedIcon}
-                  iconActive={HomeIcon}
-                  end
-                >
-                  Página inicial
-                </NavMenuItem>
+        <MenuIcon fontSize="small" />
+      </IconButton>
 
-                <NavMenuItem
-                  to="/explore"
-                  icon={TagIcon}
-                  iconActive={TagIcon}
-                  end
-                >
-                  Explorar
-                </NavMenuItem>
+      <Drawer
+        open={openMenu}
+        onClose={toggleDrawer(false)}
+        sx={{ display: { xs: 'block', md: 'none' } }}
+      >
+        <Sidebar
+          user={user}
+          setModalOpen={setModalOpen}
+          onCloseDrawer={toggleDrawer(false)}
+        />
+      </Drawer>
 
-                <NavMenuItem
-                  to={`/profile/${user.id}`}
-                  icon={PersonOutlinedIcon}
-                  iconActive={PersonIcon}
-                >
-                  Perfil
-                </NavMenuItem>
-              </MenuList>
-            </Box>
-
-            <Button
-              onClick={() => setModalOpen(true)}
-              variant="contained"
-              color="primary"
-              sx={{
-                borderRadius: 10,
-                mt: 1,
-                width: '100%',
-                fontWeight: 700
-              }}
-            >
-              Tweetar
-            </Button>
-          </Box>
-
-          <ProfileDropdown
-            name={user.name}
-            username={user.username}
-            imageUrl={user.imageUrl}
-          />
-        </Stack>
+      <Box sx={{ display: { xs: 'none', md: 'block' } }}>
+        <Sidebar user={user} setModalOpen={setModalOpen} />
       </Box>
 
       <Box

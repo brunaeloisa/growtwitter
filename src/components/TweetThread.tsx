@@ -3,10 +3,10 @@ import { TweetCard, type TweetCardProps } from './TweetCard';
 
 const ThreadLine = styled('div')(({ theme }) => ({
   position: 'absolute',
-  top: 52,
-  left: 27.5,
+  top: 54,
+  left: 31,
   width: 2,
-  bottom: -4,
+  bottom: -6,
   backgroundColor: theme.palette.divider,
   zIndex: 10,
   borderRadius: 2

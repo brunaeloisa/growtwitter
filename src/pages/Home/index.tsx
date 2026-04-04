@@ -4,6 +4,7 @@ import { fetchFeed } from '../../services/tweet.service';
 import { useAppSelector } from '../../store/hooks';
 import type { Tweet } from '../../types/tweet.types';
 import { TweetThread } from '../../components/TweetThread';
+import { NavbarTop } from '../../components/NavbarTop';
 
 export function Home() {
   const { user } = useAppSelector((state) => state.auth);
@@ -25,29 +26,24 @@ export function Home() {
 
   return (
     <>
-      <Typography
-        component="h1"
-        variant="body2"
-        sx={{
-          p: 1.5,
-          fontWeight: 800,
-          borderBottom: 1,
-          borderColor: 'divider'
-        }}
-      >
-        Página Inicial
-      </Typography>
+      <NavbarTop positionMd="static">
+        <Typography
+          component="h1"
+          variant="body2"
+          sx={{
+            px: 1.5,
+            py: { xs: 2, md: 1.5 },
+            fontWeight: 800,
+            borderBottom: 1,
+            borderColor: 'divider'
+          }}
+        >
+          Página Inicial
+        </Typography>
+      </NavbarTop>
 
       <Stack
-        divider={
-          <Divider
-            flexItem
-            sx={{
-              borderBottomWidth: 1,
-              my: 0
-            }}
-          />
-        }
+        divider={<Divider flexItem sx={{ borderBottomWidth: 1, my: 0 }} />}
       >
         {loading && tweets.length === 0 ? (
           <Typography variant="body2" sx={{ p: 1.5, textAlign: 'center' }}>
@@ -68,6 +64,10 @@ export function Home() {
           </Typography>
         )}
       </Stack>
+
+      {tweets.length > 0 && (
+        <Divider flexItem sx={{ borderBottomWidth: 1, my: 0 }} />
+      )}
     </>
   );
 }

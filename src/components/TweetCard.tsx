@@ -126,7 +126,7 @@ export function TweetCard({ tweet, onDelete, triggerRefresh }: TweetCardProps) {
 
   return (
     <>
-      <Stack direction="row" gap={1} sx={{ p: 1 }}>
+      <Stack direction="row" gap={1} sx={{ px: 1.5, py: 1.25 }}>
         <Link
           component={RouterLink}
           to={`/profile/${tweet.author.id}`}

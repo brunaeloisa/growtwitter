@@ -22,6 +22,7 @@ import CropOriginalIcon from '@mui/icons-material/CropOriginal';
 import CalendarMonthOutlinedIcon from '@mui/icons-material/CalendarMonthOutlined';
 import { Link as RouterLink } from 'react-router-dom';
 import { useOutletContext } from 'react-router-dom';
+import { NavbarTop } from '../../components/NavbarTop';
 
 function formatAccountCreationDate(dateString: string) {
   const date = new Date(dateString);
@@ -91,32 +92,53 @@ export function Profile() {
     setLoadingFollow(false);
   }
 
-  if (loading && !user) {
-    return (
-      <Typography variant="body2" sx={{ p: 1.5, textAlign: 'center' }}>
-        Carregando...
-      </Typography>
-    );
-  }
-
   if (!user) {
     return (
-      <Typography variant="body2" sx={{ p: 1.5, textAlign: 'center' }}>
-        Usuário não encontrado.
-      </Typography>
+      <>
+        <NavbarTop>
+          <Box
+            sx={{
+              px: 1,
+              height: '53px',
+              display: 'flex',
+              alignItems: 'center',
+              boxShadow: (theme) =>
+                `0 1px 2px rgba(0, 0, 0, ${theme.palette.mode === 'dark' ? 0.4 : 0.05})`
+            }}
+          >
+            <IconButton
+              aria-label="Voltar para a Página Inicial"
+              sx={{ p: 0.5 }}
+              component={RouterLink}
+              to="/"
+            >
+              <KeyboardBackspaceIcon fontSize="small" />
+            </IconButton>
+          </Box>
+        </NavbarTop>
+        <Typography variant="body2" sx={{ p: 2, textAlign: 'center' }}>
+          {loading ? 'Carregando...' : 'Usuário não encontrado.'}
+        </Typography>
+      </>
     );
   }
 
   return (
     <>
-      <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
+      <NavbarTop>
         <Stack
           direction="row"
           alignItems="center"
-          sx={{ px: 1, py: 1.5, gap: 1 }}
+          sx={{
+            px: 1,
+            gap: 1,
+            height: '53px',
+            boxShadow: (theme) =>
+              `0 1px 2px rgba(0, 0, 0, ${theme.palette.mode === 'dark' ? 0.4 : 0.08})`
+          }}
         >
           <IconButton
-            aria-label="Voltar para Página Inicial"
+            aria-label="Voltar para a Página Inicial"
             sx={{ p: 0.5 }}
             component={RouterLink}
             to="/"
@@ -135,11 +157,13 @@ export function Profile() {
               color="text.disabled"
               sx={{ fontWeight: 500 }}
             >
-              {user.tweets.length} growtweet{user.tweets.length > 1 && 's'}
+              {user.tweets.length} growtweet{user.tweets.length !== 1 && 's'}
             </Typography>
           </Box>
         </Stack>
+      </NavbarTop>
 
+      <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
         <Box
           sx={{
             height: 130,
@@ -264,18 +288,10 @@ export function Profile() {
       </Box>
 
       <Stack
-        divider={
-          <Divider
-            flexItem
-            sx={{
-              borderBottomWidth: 1,
-              my: 0
-            }}
-          />
-        }
+        divider={<Divider flexItem sx={{ borderBottomWidth: 1, my: 0 }} />}
       >
-        {user?.tweets.length ? (
-          user?.tweets.map((tweet) => (
+        {user.tweets.length ? (
+          user.tweets.map((tweet) => (
             <TweetCard key={tweet.id} tweet={tweet} onDelete={loadProfile} />
           ))
         ) : (
@@ -284,6 +300,10 @@ export function Profile() {
           </Typography>
         )}
       </Stack>
+
+      {user.tweets.length > 0 && (
+        <Divider flexItem sx={{ borderBottomWidth: 1, my: 0 }} />
+      )}
     </>
   );
 }

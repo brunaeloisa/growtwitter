@@ -1,23 +1,27 @@
 import { Box, Typography } from '@mui/material';
 import { TrendingTopic } from '../../components/TrendingTopic';
 import { topics } from '../../data/trendingTopics';
+import { NavbarTop } from '../../components/NavbarTop';
 
 export function Explore() {
   return (
     <>
-      <Typography
-        component="h1"
-        variant="body2"
-        sx={{
-          p: 1.5,
-          fontWeight: 800,
-          borderBottom: 1,
-          borderColor: 'divider',
-          marginBottom: 1
-        }}
-      >
-        Explorar
-      </Typography>
+      <NavbarTop positionMd="static">
+        <Typography
+          component="h1"
+          variant="body2"
+          sx={{
+            p: 1.5,
+            py: { xs: 2, md: 1.5 },
+            fontWeight: 800,
+            borderBottom: 1,
+            borderColor: 'divider',
+            marginBottom: 1
+          }}
+        >
+          Explorar
+        </Typography>
+      </NavbarTop>
 
       <Box
         component="ul"
