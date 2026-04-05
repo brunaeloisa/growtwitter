@@ -1,15 +1,8 @@
-import {
-  Modal,
-  Box,
-  TextField,
-  Button,
-  IconButton,
-  Snackbar,
-  Alert
-} from '@mui/material';
+import { Modal, Box, TextField, Button, IconButton } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import { useState } from 'react';
 import { postReply, postTweet } from '../services/tweet.service';
+import { CustomSnackbar } from './CustomSnackbar';
 
 interface TweetModalProps {
   open: boolean;
@@ -116,20 +109,12 @@ export default function TweetModalButton({
         </Modal>
       )}
 
-      <Snackbar
+      <CustomSnackbar
         open={snackbar.open}
-        autoHideDuration={3000}
+        message={snackbar.message}
+        severity={snackbar.severity}
         onClose={() => setSnackbar({ ...snackbar, open: false })}
-        anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
-      >
-        <Alert
-          severity={snackbar.severity}
-          variant="filled"
-          onClose={() => setSnackbar({ ...snackbar, open: false })}
-        >
-          {snackbar.message}
-        </Alert>
-      </Snackbar>
+      />
     </>
   );
 }

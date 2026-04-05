@@ -1,13 +1,4 @@
-import {
-  Avatar,
-  Box,
-  Button,
-  Stack,
-  Typography,
-  Link,
-  Snackbar,
-  Alert
-} from '@mui/material';
+import { Avatar, Box, Button, Stack, Typography, Link } from '@mui/material';
 import type { Tweet } from '../types/tweet.types';
 import CropOriginalIcon from '@mui/icons-material/CropOriginal';
 import FavoriteIcon from '@mui/icons-material/Favorite';
@@ -19,6 +10,7 @@ import { useState } from 'react';
 import { Link as RouterLink } from 'react-router-dom';
 import TweetModal from './TweetModal';
 import { useAppSelector } from '../store/hooks';
+import { CustomSnackbar } from './CustomSnackbar';
 
 function formatTimePost(dateString: string) {
   const now = Date.now();
@@ -59,10 +51,7 @@ export function TweetCard({ tweet, onDelete, triggerRefresh }: TweetCardProps) {
   const [modalOpen, setModalOpen] = useState(false);
   const [replyDelta, setReplyDelta] = useState(0);
   const [replyToTweetId, setReplyToTweetId] = useState('');
-  const [snackbar, setSnackbar] = useState({
-    open: false,
-    message: ''
-  });
+  const [snackbar, setSnackbar] = useState({ open: false, message: '' });
 
   const loggedUser = useAppSelector((state) => state.auth.user);
   const isAuthor = tweet.author.id === loggedUser?.id;
@@ -141,7 +130,7 @@ export function TweetCard({ tweet, onDelete, triggerRefresh }: TweetCardProps) {
               '& img': { bgcolor: 'background.paper' }
             }}
           >
-            <CropOriginalIcon sx={{ color: '#ffffff' }} />
+            <CropOriginalIcon sx={{ color: 'common.white' }} />
           </Avatar>
         </Link>
 
@@ -238,20 +227,12 @@ export function TweetCard({ tweet, onDelete, triggerRefresh }: TweetCardProps) {
         replyTo={replyToTweetId}
       />
 
-      <Snackbar
+      <CustomSnackbar
         open={snackbar.open}
-        autoHideDuration={3000}
+        message={snackbar.message}
+        severity="error"
         onClose={() => setSnackbar({ ...snackbar, open: false })}
-        anchorOrigin={{ vertical: 'bottom', horizontal: 'center' }}
-      >
-        <Alert
-          severity="error"
-          variant="filled"
-          onClose={() => setSnackbar({ ...snackbar, open: false })}
-        >
-          {snackbar.message}
-        </Alert>
-      </Snackbar>
+      />
     </>
   );
 }
