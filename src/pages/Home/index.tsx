@@ -1,4 +1,4 @@
-import { Divider, Stack, Typography } from '@mui/material';
+import { CircularProgress, Divider, Stack, Typography } from '@mui/material';
 import { useCallback, useEffect, useState } from 'react';
 import { fetchFeed } from '../../services/tweet.service';
 import { useAppSelector } from '../../store/hooks';
@@ -46,8 +46,17 @@ export function Home() {
         divider={<Divider flexItem sx={{ borderBottomWidth: 1, my: 0 }} />}
       >
         {loading && tweets.length === 0 ? (
-          <Typography variant="body2" sx={{ p: 1.5, textAlign: 'center' }}>
-            Carregando...
+          <Typography
+            variant="body2"
+            sx={{
+              p: 1.5,
+              justifyContent: 'center',
+              display: 'flex',
+              alignItems: 'center',
+              gap: 0.75
+            }}
+          >
+            <CircularProgress size="14px" color="inherit" /> Carregando...
           </Typography>
         ) : tweets.length ? (
           tweets.map((tweet) => (

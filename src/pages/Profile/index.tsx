@@ -14,7 +14,8 @@ import {
   Typography,
   IconButton,
   Avatar,
-  Button
+  Button,
+  CircularProgress
 } from '@mui/material';
 import { TweetCard } from '../../components/TweetCard';
 import KeyboardBackspaceIcon from '@mui/icons-material/KeyboardBackspace';
@@ -116,8 +117,24 @@ export function Profile() {
             </IconButton>
           </Box>
         </NavbarTop>
-        <Typography variant="body2" sx={{ p: 2, textAlign: 'center' }}>
-          {loading ? 'Carregando...' : 'Usuário não encontrado.'}
+
+        <Typography
+          variant="body2"
+          sx={{
+            p: 2,
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            gap: 0.75
+          }}
+        >
+          {loading ? (
+            <>
+              <CircularProgress size="1em" color="inherit" /> Carregando...
+            </>
+          ) : (
+            'Usuário não encontrado.'
+          )}
         </Typography>
       </>
     );

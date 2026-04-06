@@ -7,6 +7,7 @@ import logoLight from '../../assets/logo-light.svg';
 import {
   Box,
   Button,
+  CircularProgress,
   Container,
   IconButton,
   Paper,
@@ -107,7 +108,18 @@ export function Login() {
                 sx={{ my: 2, borderRadius: 2, p: 1.25, fontSize: '1rem' }}
                 disabled={!username || !password || loading}
               >
-                {loading ? 'Entrando...' : 'Entrar'}
+                {loading ? (
+                  <>
+                    <CircularProgress
+                      size="1em"
+                      color="inherit"
+                      sx={{ verticalAlign: 'middle', mr: 1 }}
+                    />
+                    Entrando...
+                  </>
+                ) : (
+                  'Entrar'
+                )}
               </Button>
             </Box>
           </Paper>

@@ -1,4 +1,11 @@
-import { Modal, Box, TextField, Button, IconButton } from '@mui/material';
+import {
+  Modal,
+  Box,
+  TextField,
+  Button,
+  IconButton,
+  CircularProgress
+} from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
 import { useState } from 'react';
 import { postReply, postTweet } from '../services/tweet.service';
@@ -102,7 +109,18 @@ export default function TweetModalButton({
                 onClick={handleTweet}
                 disabled={!tweetContent.trim() || loading}
               >
-                {loading ? 'Tweetando...' : 'Tweetar'}
+                {loading ? (
+                  <>
+                    <CircularProgress
+                      size="1em"
+                      color="inherit"
+                      sx={{ verticalAlign: 'middle', mr: 1 }}
+                    />
+                    Tweetando...
+                  </>
+                ) : (
+                  'Tweetar'
+                )}
               </Button>
             </Box>
           </Box>
