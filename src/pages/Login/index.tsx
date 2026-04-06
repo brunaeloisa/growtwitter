@@ -2,6 +2,8 @@ import { loginThunk } from '../../store/auth/auth.thunk';
 import { Navigate } from 'react-router-dom';
 import { toggleTheme } from '../../store/theme/theme.slice';
 import Brightness4Icon from '@mui/icons-material/Brightness4';
+import logoDark from '../../assets/logo-dark.svg';
+import logoLight from '../../assets/logo-light.svg';
 import {
   Box,
   Button,
@@ -9,24 +11,31 @@ import {
   IconButton,
   Paper,
   TextField,
-  Typography
+  useTheme
 } from '@mui/material';
 import { useAppDispatch, useAppSelector } from '../../store/hooks';
 import { useState } from 'react';
+import { CustomSnackbar } from '../../components/CustomSnackbar';
 
 export function Login() {
   const dispatch = useAppDispatch();
+  const theme = useTheme();
   const { user, token, loading, error } = useAppSelector((state) => state.auth);
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
+  const [snackbarOpen, setSnackbarOpen] = useState(false);
 
   if (user && token) {
     return <Navigate to="/" replace />;
   }
 
-  function handleLogin(e: React.FormEvent) {
+  async function handleLogin(e: React.SubmitEvent<HTMLFormElement>) {
     e.preventDefault();
-    dispatch(loginThunk({ username, password }));
+    try {
+      await dispatch(loginThunk({ username, password })).unwrap();
+    } catch {
+      setSnackbarOpen(true);
+    }
   }
 
   function handleThemeToggle() {
@@ -35,7 +44,7 @@ export function Login() {
 
   return (
     <>
-      <Container maxWidth="sm">
+      <Container maxWidth="sm" sx={{ p: 1 }}>
         <Box
           sx={{
             minHeight: '100vh',
@@ -46,23 +55,23 @@ export function Login() {
         >
           <Paper
             elevation={3}
+            aria-label="Entrar no GrowTwitter"
             sx={{
-              p: 4,
+              p: { xs: 3, sm: 4 },
               width: '90%',
               borderRadius: 2
             }}
           >
-            <Typography
-              variant="h4"
-              component="h1"
-              align="center"
-              gutterBottom
-              sx={{ fontWeight: 'bold', mb: 4 }}
-            >
-              Growtwitter
-            </Typography>
+            <Box sx={{ textAlign: 'center', p: 1, mb: { xs: 0, sm: 1.5 } }}>
+              <Box
+                component="img"
+                src={theme.palette.mode === 'dark' ? logoDark : logoLight}
+                alt="growtweet"
+                sx={{ height: { xs: 30, sm: 40 }, maxWidth: '100%' }}
+              />
+            </Box>
 
-            <form onSubmit={handleLogin}>
+            <Box component="form" onSubmit={handleLogin}>
               <TextField
                 fullWidth
                 label="Usuário"
@@ -71,6 +80,9 @@ export function Login() {
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
                 required
+                slotProps={{
+                  inputLabel: { required: false }
+                }}
               />
 
               <TextField
@@ -82,6 +94,9 @@ export function Login() {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 required
+                slotProps={{
+                  inputLabel: { required: false }
+                }}
               />
 
               <Button
@@ -89,25 +104,16 @@ export function Login() {
                 fullWidth
                 variant="contained"
                 size="large"
-                sx={{ mt: 3, mb: 2 }}
-                disabled={!username || !password}
+                sx={{ my: 2, borderRadius: 2, p: 1.25, fontSize: '1rem' }}
+                disabled={!username || !password || loading}
               >
                 {loading ? 'Entrando...' : 'Entrar'}
               </Button>
-            </form>
-            {error && (
-              <Typography
-                variant="body2"
-                component="p"
-                align="center"
-                sx={{ mt: 1, color: 'error.main' }}
-              >
-                {error}
-              </Typography>
-            )}
+            </Box>
           </Paper>
         </Box>
       </Container>
+
       <IconButton
         aria-label="Trocar tema"
         onClick={handleThemeToggle}
@@ -115,6 +121,13 @@ export function Login() {
       >
         <Brightness4Icon />
       </IconButton>
+
+      <CustomSnackbar
+        open={snackbarOpen}
+        message={error}
+        severity="error"
+        onClose={() => setSnackbarOpen(false)}
+      />
     </>
   );
 }
