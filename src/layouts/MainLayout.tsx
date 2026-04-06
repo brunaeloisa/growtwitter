@@ -12,22 +12,32 @@ import { Sidebar } from '../components/Sidebar';
 import { TrendingTopic } from '../components/TrendingTopic';
 import TweetModal from '../components/TweetModal';
 import { topics } from '../data/trendingTopics';
-import { getFollowingList } from '../services/user.service';
+import { getUserData } from '../services/user.service';
 import { useAppSelector } from '../store/hooks';
 import MenuIcon from '@mui/icons-material/Menu';
+import { useAppDispatch } from '../store/hooks';
+import { updateUserImage } from '../store/auth/auth.slice';
 
 export function MainLayout() {
   const { user, token } = useAppSelector((state) => state.auth);
   const sidebarTopics = topics.slice(0, 5);
   const [modalOpen, setModalOpen] = useState(false);
   const [openMenu, setOpenMenu] = useState(false);
-
   const [followingList, setFollowingList] = useState<string[]>([]);
   const [profileRefreshKey, setProfileRefreshKey] = useState(0);
+  const dispatch = useAppDispatch();
 
   useEffect(() => {
-    getFollowingList().then(setFollowingList);
-  }, []);
+    if (!user?.id) return;
+
+    getUserData(user.id).then(({ imageUrl, following }) => {
+      setFollowingList(following);
+
+      if (imageUrl) {
+        dispatch(updateUserImage(imageUrl));
+      }
+    });
+  }, [dispatch, user]);
 
   function handleTweetCreated() {
     if (location.pathname === `/profile/${user?.id}`) {

@@ -202,7 +202,7 @@ export function Profile() {
             }
           }}
         >
-          <CropOriginalIcon fontSize="small" sx={{ color: '#ffffff' }} />
+          <CropOriginalIcon sx={{ color: 'common.white', fontSize: '54px' }} />
         </Avatar>
 
         <Box sx={{ px: 2, p: 1.5 }}>

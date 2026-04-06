@@ -88,7 +88,7 @@ export default function ProfileDropdown({
               }
             }}
           >
-            <CropOriginalIcon fontSize="small" sx={{ color: '#ffffff' }} />
+            <CropOriginalIcon fontSize="small" sx={{ color: 'common.white' }} />
           </Avatar>
 
           <Box sx={{ overflow: 'hidden', flex: 1 }}>

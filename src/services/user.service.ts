@@ -35,16 +35,6 @@ export async function getUserProfileById(
   }
 }
 
-export async function getFollowingList(): Promise<string[]> {
-  try {
-    const response = await api.get('/followers');
-    return response.data.data.followings.map((user: UserBackend) => user.id);
-  } catch {
-    console.error('Erro ao carregar lista de usuários seguidos.');
-    return [];
-  }
-}
-
 export async function followUser(userId: string): Promise<boolean> {
   try {
     await api.post('/followers', { userId });
@@ -62,5 +52,26 @@ export async function unfollowUser(userId: string): Promise<boolean> {
   } catch {
     console.error(`Erro ao deixar de seguir o usuário ${userId}.`);
     return false;
+  }
+}
+
+export async function getUserData(userId: string): Promise<{
+  imageUrl: string | null;
+  following: string[];
+}> {
+  try {
+    const response = await api.get(`/users/${userId}`);
+    const user = response.data.data;
+
+    return {
+      imageUrl: user.imageUrl ?? null,
+      following: user.following.map((user: UserBackend) => user.id) ?? []
+    };
+  } catch {
+    console.error('Erro ao buscar dados do usário logado.');
+    return {
+      imageUrl: null,
+      following: []
+    };
   }
 }

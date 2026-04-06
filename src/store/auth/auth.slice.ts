@@ -27,6 +27,11 @@ const userSlice = createSlice({
       state.token = null;
       state.loading = false;
       state.error = null;
+    },
+    updateUserImage: (state, action) => {
+      if (state.user) {
+        state.user.imageUrl = action.payload;
+      }
     }
   },
   extraReducers: (builder) => {
@@ -53,6 +58,6 @@ const authPersistConfig = {
   whitelist: ['user', 'token']
 };
 
-export const { logout } = userSlice.actions;
+export const { logout, updateUserImage } = userSlice.actions;
 
 export default persistReducer(authPersistConfig, userSlice.reducer);
