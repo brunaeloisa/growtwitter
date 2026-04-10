@@ -104,3 +104,17 @@ export async function deleteTweet(tweetId: string): Promise<boolean> {
     return false;
   }
 }
+
+export async function getTweetById(
+  tweetId: string,
+  currentUserId: string
+): Promise<Tweet | null> {
+  try {
+    const response = await api.get(`/tweets/${tweetId}`);
+    const tweet = response.data.data;
+    return normalizeTweets([tweet], currentUserId)[0];
+  } catch {
+    console.error(`Erro ao buscar growtweet ${tweetId}.`);
+    return null;
+  }
+}

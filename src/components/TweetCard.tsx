@@ -1,4 +1,5 @@
 import { Avatar, Box, Button, Stack, Typography, Link } from '@mui/material';
+import { alpha } from '@mui/material/styles';
 import type { Tweet } from '../types/tweet.types';
 import CropOriginalIcon from '@mui/icons-material/CropOriginal';
 import FavoriteIcon from '@mui/icons-material/Favorite';
@@ -7,44 +8,27 @@ import ChatBubbleOutlineRoundedIcon from '@mui/icons-material/ChatBubbleOutlineR
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
 import { deleteTweet, likeTweet, unlikeTweet } from '../services/tweet.service';
 import { useState } from 'react';
-import { Link as RouterLink } from 'react-router-dom';
+import { Link as RouterLink, useNavigate } from 'react-router-dom';
 import TweetModal from './TweetModal';
 import { useAppSelector } from '../store/hooks';
 import { CustomSnackbar } from './CustomSnackbar';
-
-function formatTimePost(dateString: string) {
-  const now = Date.now();
-  const postDate = new Date(dateString);
-  const diff = now - postDate.getTime();
-
-  const seconds = Math.floor(diff / 1000);
-  const minutes = Math.floor(diff / 60000);
-  const hours = Math.floor(diff / 3600000);
-  const days = Math.floor(diff / 86400000);
-
-  if (seconds < 60) return `${seconds}s`;
-  if (minutes < 60) return `${minutes}min`;
-  if (hours < 24) return `${hours}h`;
-  if (days < 7) return `${days}d`;
-
-  const currentYear = new Date().getFullYear();
-  const postYear = postDate.getFullYear();
-
-  const options: Intl.DateTimeFormatOptions =
-    currentYear === postYear
-      ? { day: 'numeric', month: 'short' }
-      : { day: 'numeric', month: 'short', year: '2-digit' };
-
-  return postDate.toLocaleDateString('pt-BR', options).replace(/ de /g, ' ');
-}
+import { formatFullDateTime, formatRelativeTime } from '../utils/dateFormat';
 
 export interface TweetCardProps {
   tweet: Tweet;
   onDelete: () => void;
   triggerRefresh?: () => void;
+  replyTo?: string;
+  highlight?: boolean;
 }
 
-export function TweetCard({ tweet, onDelete, triggerRefresh }: TweetCardProps) {
+export function TweetCard({
+  tweet,
+  onDelete,
+  triggerRefresh,
+  replyTo,
+  highlight = false
+}: TweetCardProps) {
   const [liked, setLiked] = useState(tweet.likedByUser);
   const [likeCount, setLikeCount] = useState(tweet.likeCount);
   const [loading, setLoading] = useState(false);
@@ -56,6 +40,7 @@ export function TweetCard({ tweet, onDelete, triggerRefresh }: TweetCardProps) {
   const loggedUser = useAppSelector((state) => state.auth.user);
   const isAuthor = tweet.author.id === loggedUser?.id;
   const replyCount = (tweet.replies?.length ?? 0) + replyDelta;
+  const navigate = useNavigate();
 
   const actionButtonStyle = {
     display: 'flex',
@@ -66,6 +51,38 @@ export function TweetCard({ tweet, onDelete, triggerRefresh }: TweetCardProps) {
     color: 'text.disabled',
     bgcolor: 'transparent'
   };
+
+  const authorLink = (
+    <Link
+      component={RouterLink}
+      to={`/profile/${tweet.author.id}`}
+      underline="none"
+      color="inherit"
+      onClick={(e) => e.stopPropagation()}
+      sx={{
+        display: 'flex',
+        flexDirection: highlight ? 'column' : 'row',
+        gap: highlight ? 0 : 0.5
+      }}
+    >
+      <Typography
+        variant={highlight ? 'body2' : 'caption'}
+        fontWeight={800}
+        sx={{ '&:hover': { textDecoration: 'underline' } }}
+      >
+        {tweet.author.name}
+      </Typography>
+
+      <Typography
+        variant="caption"
+        fontWeight={500}
+        color="text.disabled"
+        sx={{ '&:hover': { textDecoration: 'underline' } }}
+      >
+        @{tweet.author.username}
+      </Typography>
+    </Link>
+  );
 
   async function handleLike() {
     if (loading) return;
@@ -104,7 +121,7 @@ export function TweetCard({ tweet, onDelete, triggerRefresh }: TweetCardProps) {
   }
 
   const handleTweetCreated = () => {
-    if (location.pathname === '/' && triggerRefresh) {
+    if (triggerRefresh) {
       triggerRefresh();
     } else {
       setReplyDelta((prev) => prev + 1);
@@ -113,58 +130,105 @@ export function TweetCard({ tweet, onDelete, triggerRefresh }: TweetCardProps) {
     setModalOpen(false);
   };
 
+  function handleTweetClick(event: React.MouseEvent<HTMLDivElement>): void {
+    const target = event.currentTarget as HTMLElement;
+    const parentId = target.getAttribute('data-reply-to');
+
+    if (parentId) {
+      navigate(`/tweet/${parentId}?reply=${tweet.id}`);
+    } else {
+      navigate(`/tweet/${tweet.id}`);
+    }
+  }
+
   return (
     <>
-      <Stack direction="row" gap={1} sx={{ px: 1.5, py: 1.25 }}>
-        <Link
-          component={RouterLink}
-          to={`/profile/${tweet.author.id}`}
-          underline="none"
-          color="inherit"
-        >
-          <Avatar
-            src={tweet.author.imageUrl ?? undefined}
-            sx={{
-              width: 40,
-              height: 40,
-              '& img': { bgcolor: 'background.paper' }
-            }}
-          >
-            <CropOriginalIcon sx={{ color: 'common.white' }} />
-          </Avatar>
-        </Link>
-
-        <Box>
+      <Stack
+        direction={highlight ? 'column' : 'row'}
+        sx={{
+          gap: 1,
+          px: 1.5,
+          py: 1.25,
+          '&:hover': {
+            cursor: 'pointer',
+            bgcolor: (theme) => alpha(theme.palette.background.paper, 0.25)
+          }
+        }}
+        onClick={handleTweetClick}
+        data-reply-to={replyTo}
+      >
+        <Stack direction="row" gap={1} alignItems="center">
           <Link
             component={RouterLink}
             to={`/profile/${tweet.author.id}`}
             underline="none"
             color="inherit"
+            onClick={(e) => e.stopPropagation()}
+            sx={{
+              display: 'flex',
+              borderRadius: '50%',
+              alignSelf: 'flex-start',
+              '&:hover .MuiAvatar-root': {
+                opacity: 0.7,
+                transition: 'opacity 0.2s'
+              }
+            }}
           >
+            <Avatar
+              src={tweet.author.imageUrl ?? undefined}
+              sx={{
+                width: 40,
+                height: 40,
+                '& img': { bgcolor: 'background.paper' }
+              }}
+            >
+              <CropOriginalIcon sx={{ color: 'common.white' }} />
+            </Avatar>
+          </Link>
+
+          {highlight && authorLink}
+        </Stack>
+
+        <Box sx={{ p: highlight ? 0.25 : 0 }}>
+          {!highlight && (
             <Box sx={{ display: 'flex', gap: 0.5 }}>
-              <Typography variant="caption" fontWeight={800}>
-                {tweet.author.name}
-              </Typography>
+              {authorLink}
 
               <Typography
                 variant="caption"
-                fontWeight={500}
                 color="text.disabled"
+                sx={{ display: highlight ? 'none' : 'inline-block' }}
               >
-                @{tweet.author.username}
-              </Typography>
-
-              <Typography variant="caption" color="text.disabled">
-                • {formatTimePost(tweet.createdAt)}
+                • {formatRelativeTime(tweet.createdAt)}
               </Typography>
             </Box>
-          </Link>
+          )}
 
-          <Typography variant="caption" color="text.secondary" component="div">
+          <Typography
+            variant={highlight ? 'body1' : 'caption'}
+            color="text.secondary"
+            component="div"
+            sx={{ my: highlight ? 0.75 : 0 }}
+          >
             {tweet.content}
           </Typography>
 
-          <Stack direction="row" marginTop={0.5} gap={2}>
+          {highlight && (
+            <Typography
+              variant={'caption'}
+              color="text.disabled"
+              component="div"
+              sx={{ my: 1.5 }}
+            >
+              {formatFullDateTime(tweet.createdAt)}
+            </Typography>
+          )}
+
+          <Stack
+            direction="row"
+            sx={{ width: 'fit-content', gap: 2, mt: 0.5 }}
+            onClick={(e) => e.stopPropagation()}
+          >
             {tweet.replies && (
               <Box sx={{ width: 40 }}>
                 <Button

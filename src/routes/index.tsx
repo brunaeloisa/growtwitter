@@ -4,6 +4,7 @@ import { Profile } from '../pages/Profile';
 import { Explore } from '../pages/Explore';
 import { Login } from '../pages/Login';
 import { MainLayout } from '../layouts/MainLayout';
+import { TweetDetail } from '../pages/TweetDetail';
 
 export const router = createBrowserRouter([
   {
@@ -25,6 +26,10 @@ export const router = createBrowserRouter([
       {
         path: 'profile/:id',
         element: <Profile />
+      },
+      {
+        path: 'tweet/:id',
+        element: <TweetDetail />
       }
     ]
   }
