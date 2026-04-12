@@ -129,6 +129,10 @@ export function TweetDetail() {
                   triggerRefresh={() => setTweetRefreshKey((prev) => prev + 1)}
                   onDelete={loadTweet}
                   replyTo={tweet.id}
+                  parentAuthor={{
+                    id: tweet.author.id,
+                    username: tweet.author.username
+                  }}
                 />
               ))}
             </Stack>

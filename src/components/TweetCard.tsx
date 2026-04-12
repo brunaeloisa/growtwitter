@@ -20,6 +20,7 @@ export interface TweetCardProps {
   triggerRefresh?: () => void;
   replyTo?: string;
   highlight?: boolean;
+  parentAuthor?: { id: string; username: string };
 }
 
 export function TweetCard({
@@ -27,7 +28,8 @@ export function TweetCard({
   onDelete,
   triggerRefresh,
   replyTo,
-  highlight = false
+  highlight = false,
+  parentAuthor
 }: TweetCardProps) {
   const [liked, setLiked] = useState(tweet.likedByUser);
   const [likeCount, setLikeCount] = useState(tweet.likeCount);
@@ -202,6 +204,28 @@ export function TweetCard({
                 • {formatRelativeTime(tweet.createdAt)}
               </Typography>
             </Box>
+          )}
+
+          {parentAuthor && !highlight && (
+            <Typography
+              variant="caption"
+              color="text.disabled"
+              sx={{ display: 'block', lineHeight: 1.3, mb: 0.5 }}
+            >
+              Em resposta a{' '}
+              <Link
+                component={RouterLink}
+                to={`/profile/${parentAuthor.id}`}
+                sx={{
+                  color: 'primary.main',
+                  textDecoration: 'none',
+                  '&:hover': { textDecoration: 'underline' }
+                }}
+                onClick={(e) => e.stopPropagation()}
+              >
+                @{parentAuthor.username}
+              </Link>
+            </Typography>
           )}
 
           <Typography
