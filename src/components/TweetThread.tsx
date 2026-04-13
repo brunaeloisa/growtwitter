@@ -1,5 +1,6 @@
 import { Box, Stack, styled } from '@mui/material';
-import { TweetCard, type TweetCardProps } from './TweetCard';
+import { TweetCard } from './TweetCard';
+import type { Tweet } from '../types/tweet.types';
 
 const ThreadLine = styled('div')(({ theme }) => ({
   position: 'absolute',
@@ -12,30 +13,50 @@ const ThreadLine = styled('div')(({ theme }) => ({
   borderRadius: 2
 }));
 
+export interface TweetThreadProps {
+  tweet: Tweet;
+  onDelete: () => void;
+  onToggleLike?: (tweetId: string, isLiked: boolean) => void;
+  triggerRefresh?: () => void;
+  activeReplyId?: string;
+}
+
 export function TweetThread({
   tweet,
   onDelete,
-  triggerRefresh
-}: TweetCardProps) {
+  onToggleLike,
+  triggerRefresh,
+  activeReplyId
+}: TweetThreadProps) {
+  const visibleReplies = activeReplyId
+    ? tweet.replies?.filter((reply) => String(reply.id) === activeReplyId)
+    : tweet.replies;
+
+  const hasReplies = visibleReplies && visibleReplies.length > 0;
+
   return (
     <Stack>
       <Box position="relative">
         <TweetCard
           tweet={tweet}
           onDelete={onDelete}
+          onToggleLike={onToggleLike}
           triggerRefresh={triggerRefresh}
         />
-        {tweet.replies && tweet.replies.length > 0 && <ThreadLine />}
+        {hasReplies && <ThreadLine />}
       </Box>
 
-      {(tweet.replies || []).map((reply, index) => (
+      {(visibleReplies || []).map((reply, index) => (
         <Box key={reply.id} position="relative">
           <TweetCard
             tweet={reply}
             onDelete={onDelete}
+            onToggleLike={onToggleLike}
             triggerRefresh={triggerRefresh}
+            replyTo={tweet.id}
+            highlight={reply.id === activeReplyId}
           />
-          {index < (tweet.replies?.length ?? 0) - 1 && <ThreadLine />}
+          {index < (visibleReplies?.length ?? 0) - 1 && <ThreadLine />}
         </Box>
       ))}
     </Stack>
