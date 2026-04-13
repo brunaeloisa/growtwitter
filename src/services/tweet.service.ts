@@ -1,4 +1,4 @@
-import { AxiosError } from 'axios';
+import axios from 'axios';
 import type { Tweet, TweetBackend } from '../types/tweet.types';
 import { api } from './api.service';
 
@@ -41,8 +41,8 @@ export async function fetchFeed(currentUserId: string): Promise<Tweet[]> {
     const response = await api.get('/feed');
 
     return normalizeTweets(response.data.data, currentUserId);
-  } catch (err) {
-    if (err instanceof AxiosError && err.response?.status === 401) {
+  } catch (error) {
+    if (axios.isAxiosError(error) && error.response?.status === 401) {
       console.error('Token inválido ou expirado.');
     } else {
       console.error('Erro ao sincronizar feed.');
@@ -56,8 +56,12 @@ export async function likeTweet(tweetId: string): Promise<boolean> {
   try {
     await api.post('/likes', { tweetId });
     return true;
-  } catch {
-    console.error('Erro ao processar o like.');
+  } catch (error) {
+    if (axios.isAxiosError(error) && error.response?.status === 409) {
+      return true;
+    }
+
+    console.error('Erro ao processar o like:', error);
     return false;
   }
 }
@@ -66,8 +70,12 @@ export async function unlikeTweet(tweetId: string): Promise<boolean> {
   try {
     await api.delete('/likes', { data: { tweetId } });
     return true;
-  } catch {
-    console.error('Erro ao remover like.');
+  } catch (error) {
+    if (axios.isAxiosError(error) && error.response?.status === 404) {
+      return true;
+    }
+
+    console.error('Erro ao remover like:', error);
     return false;
   }
 }

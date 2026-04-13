@@ -17,6 +17,7 @@ import { formatFullDateTime, formatRelativeTime } from '../utils/dateFormat';
 export interface TweetCardProps {
   tweet: Tweet;
   onDelete: () => void;
+  onToggleLike?: (tweetId: string, isLiked: boolean) => void;
   triggerRefresh?: () => void;
   replyTo?: string;
   highlight?: boolean;
@@ -26,6 +27,7 @@ export interface TweetCardProps {
 export function TweetCard({
   tweet,
   onDelete,
+  onToggleLike,
   triggerRefresh,
   replyTo,
   highlight = false,
@@ -91,18 +93,23 @@ export function TweetCard({
 
     setLoading(true);
 
+    const wasLiked = liked;
     const prevCount = likeCount;
 
-    setLiked(!liked);
-    setLikeCount((prev: number) => (liked ? prev - 1 : prev + 1));
+    setLiked(!wasLiked);
+    setLikeCount((prev: number) => (wasLiked ? prev - 1 : prev + 1));
 
-    const success = liked
+    onToggleLike?.(tweet.id, !wasLiked);
+
+    const success = wasLiked
       ? await unlikeTweet(tweet.id)
       : await likeTweet(tweet.id);
 
     if (!success) {
-      setLiked(!liked);
+      setLiked(!wasLiked);
       setLikeCount(prevCount);
+
+      onToggleLike?.(tweet.id, wasLiked);
     }
 
     setLoading(false);

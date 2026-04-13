@@ -19,11 +19,31 @@ import { TweetCard } from '../../components/TweetCard';
 export function TweetDetail() {
   const loggedUser = useAppSelector((state) => state.auth.user);
   const { id: tweetId } = useParams<{ id: string }>();
-  const replyId = useSearchParams()[0].get('reply');
+  const [searchParams] = useSearchParams();
+  const replyId = searchParams.get('reply');
   const [tweet, setTweet] = useState<Tweet | null>(null);
   const [loading, setLoading] = useState(true);
   const [tweetRefreshKey, setTweetRefreshKey] = useState(0);
   const navigate = useNavigate();
+
+  const handleToggleLike = useCallback((tweetId: string, isLiked: boolean) => {
+    const updateTweet = (t: Tweet): Tweet => ({
+      ...t,
+      likedByUser: isLiked,
+      likeCount: isLiked ? t.likeCount + 1 : t.likeCount - 1
+    });
+
+    setTweet((prev) => {
+      if (!prev) return null;
+      if (prev.id === tweetId) return updateTweet(prev);
+
+      const updatedReplies = prev.replies?.map((reply) =>
+        reply.id === tweetId ? updateTweet(reply) : reply
+      );
+
+      return { ...prev, replies: updatedReplies };
+    });
+  }, []);
 
   const loadTweet = useCallback(() => {
     if (!loggedUser?.id || !tweetId) return;
@@ -102,9 +122,9 @@ export function TweetDetail() {
           {replyId ? (
             <Box>
               <TweetThread
-                key={tweet.id}
                 tweet={tweet}
                 onDelete={loadTweet}
+                onToggleLike={handleToggleLike}
                 triggerRefresh={() => setTweetRefreshKey((prev) => prev + 1)}
                 activeReplyId={replyId}
               />
@@ -119,6 +139,7 @@ export function TweetDetail() {
                 tweet={tweet}
                 triggerRefresh={() => setTweetRefreshKey((prev) => prev + 1)}
                 onDelete={loadTweet}
+                onToggleLike={handleToggleLike}
                 highlight={true}
               />
 
@@ -128,6 +149,7 @@ export function TweetDetail() {
                   tweet={reply}
                   triggerRefresh={() => setTweetRefreshKey((prev) => prev + 1)}
                   onDelete={loadTweet}
+                  onToggleLike={handleToggleLike}
                   replyTo={tweet.id}
                   parentAuthor={{
                     id: tweet.author.id,

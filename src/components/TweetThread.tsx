@@ -16,6 +16,7 @@ const ThreadLine = styled('div')(({ theme }) => ({
 export interface TweetThreadProps {
   tweet: Tweet;
   onDelete: () => void;
+  onToggleLike?: (tweetId: string, isLiked: boolean) => void;
   triggerRefresh?: () => void;
   activeReplyId?: string;
 }
@@ -23,6 +24,7 @@ export interface TweetThreadProps {
 export function TweetThread({
   tweet,
   onDelete,
+  onToggleLike,
   triggerRefresh,
   activeReplyId
 }: TweetThreadProps) {
@@ -38,6 +40,7 @@ export function TweetThread({
         <TweetCard
           tweet={tweet}
           onDelete={onDelete}
+          onToggleLike={onToggleLike}
           triggerRefresh={triggerRefresh}
         />
         {hasReplies && <ThreadLine />}
@@ -48,6 +51,7 @@ export function TweetThread({
           <TweetCard
             tweet={reply}
             onDelete={onDelete}
+            onToggleLike={onToggleLike}
             triggerRefresh={triggerRefresh}
             replyTo={tweet.id}
             highlight={reply.id === activeReplyId}
