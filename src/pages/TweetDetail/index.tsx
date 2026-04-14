@@ -76,7 +76,8 @@ export function TweetDetail() {
             px: 1,
             gap: 1,
             borderBottom: 1,
-            borderColor: 'divider'
+            borderColor: 'divider',
+            height: '100%'
           }}
         >
           <IconButton
@@ -87,14 +88,7 @@ export function TweetDetail() {
             <KeyboardBackspaceIcon fontSize="small" />
           </IconButton>
 
-          <Typography
-            component="h1"
-            variant="body2"
-            sx={{
-              py: { xs: 2, md: 1.5 },
-              fontWeight: 800
-            }}
-          >
+          <Typography component="h1" variant="body2" sx={{ fontWeight: 800 }}>
             Growtweet
           </Typography>
         </Stack>

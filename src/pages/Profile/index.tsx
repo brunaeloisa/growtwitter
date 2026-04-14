@@ -5,7 +5,7 @@ import {
   getUserProfileById,
   unfollowUser
 } from '../../services/user.service';
-import { useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import type { UserProfile } from '../../types/user.types';
 import {
   Box,
@@ -21,7 +21,6 @@ import { TweetCard } from '../../components/TweetCard';
 import KeyboardBackspaceIcon from '@mui/icons-material/KeyboardBackspace';
 import CropOriginalIcon from '@mui/icons-material/CropOriginal';
 import CalendarMonthOutlinedIcon from '@mui/icons-material/CalendarMonthOutlined';
-import { Link as RouterLink } from 'react-router-dom';
 import { useOutletContext } from 'react-router-dom';
 import { NavbarTop } from '../../components/NavbarTop';
 
@@ -45,6 +44,8 @@ interface OutletContext {
 export function Profile() {
   const loggedUser = useAppSelector((state) => state.auth.user);
   const { id: userId } = useParams<{ id: string }>();
+  const navigate = useNavigate();
+
   const [loading, setLoading] = useState(true);
   const [loadingFollow, setLoadingFollow] = useState(false);
   const [user, setUser] = useState<UserProfile | null>(null);
@@ -100,18 +101,17 @@ export function Profile() {
           <Box
             sx={{
               px: 1,
-              height: '53px',
+              height: '100%',
               display: 'flex',
               alignItems: 'center',
-              boxShadow: (theme) =>
-                `0 1px 2px rgba(0, 0, 0, ${theme.palette.mode === 'dark' ? 0.4 : 0.05})`
+              borderBottom: 1,
+              borderColor: 'divider'
             }}
           >
             <IconButton
-              aria-label="Voltar para a Página Inicial"
+              aria-label="Voltar"
               sx={{ p: 0.5 }}
-              component={RouterLink}
-              to="/"
+              onClick={() => navigate(-1)}
             >
               <KeyboardBackspaceIcon fontSize="small" />
             </IconButton>
@@ -149,22 +149,31 @@ export function Profile() {
           sx={{
             px: 1,
             gap: 1,
-            height: '53px',
+            height: 'calc(100% - 1px)',
             boxShadow: (theme) =>
               `0 1px 2px rgba(0, 0, 0, ${theme.palette.mode === 'dark' ? 0.4 : 0.08})`
           }}
         >
           <IconButton
-            aria-label="Voltar para a Página Inicial"
+            aria-label="Voltar"
             sx={{ p: 0.5 }}
-            component={RouterLink}
-            to="/"
+            onClick={() => navigate(-1)}
           >
             <KeyboardBackspaceIcon fontSize="small" />
           </IconButton>
 
-          <Box>
-            <Typography component="h1" variant="body2" sx={{ fontWeight: 800 }}>
+          <Box sx={{ minWidth: 0, flex: 1, pr: { xs: '40px', md: 0 } }}>
+            <Typography
+              component="h1"
+              variant="body2"
+              sx={{
+                fontWeight: 800,
+                overflow: 'hidden',
+                textOverflow: 'ellipsis',
+                whiteSpace: 'nowrap',
+                display: 'block'
+              }}
+            >
               {user.name}
             </Typography>
 

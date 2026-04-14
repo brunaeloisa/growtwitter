@@ -73,7 +73,7 @@ export function MainLayout() {
         sx={{
           display: { xs: 'inline-flex', md: 'none' },
           position: 'absolute',
-          top: 8,
+          top: 6,
           right: 8,
           zIndex: 30
         }}

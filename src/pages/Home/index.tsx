@@ -1,4 +1,10 @@
-import { CircularProgress, Divider, Stack, Typography } from '@mui/material';
+import {
+  Box,
+  CircularProgress,
+  Divider,
+  Stack,
+  Typography
+} from '@mui/material';
 import { useCallback, useEffect, useState } from 'react';
 import { fetchFeed } from '../../services/tweet.service';
 import { useAppSelector } from '../../store/hooks';
@@ -27,19 +33,20 @@ export function Home() {
   return (
     <>
       <NavbarTop positionMd="static">
-        <Typography
-          component="h1"
-          variant="body2"
+        <Box
           sx={{
+            height: '100%',
+            display: 'flex',
+            alignItems: 'center',
             px: 1.5,
-            py: { xs: 2, md: 1.5 },
-            fontWeight: 800,
             borderBottom: 1,
             borderColor: 'divider'
           }}
         >
-          Página Inicial
-        </Typography>
+          <Typography component="h1" variant="body2" sx={{ fontWeight: 800 }}>
+            Página Inicial
+          </Typography>
+        </Box>
       </NavbarTop>
 
       <Stack

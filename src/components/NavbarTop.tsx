@@ -13,6 +13,8 @@ export function NavbarTop({ children, positionMd = 'sticky' }: NavbarTopProps) {
         position: { xs: 'sticky', md: positionMd },
         top: 0,
         zIndex: 20,
+        height: { xs: 49, md: 45 },
+        overflow: 'hidden',
         backdropFilter: 'blur(10px)',
         WebkitBackdropFilter: 'blur(10px)',
         bgcolor: (theme) =>

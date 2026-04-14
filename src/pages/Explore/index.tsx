@@ -7,30 +7,23 @@ export function Explore() {
   return (
     <>
       <NavbarTop positionMd="static">
-        <Typography
-          component="h1"
-          variant="body2"
+        <Box
           sx={{
-            p: 1.5,
-            py: { xs: 2, md: 1.5 },
-            fontWeight: 800,
+            height: '100%',
+            display: 'flex',
+            alignItems: 'center',
+            px: 1.5,
             borderBottom: 1,
-            borderColor: 'divider',
-            marginBottom: 1
+            borderColor: 'divider'
           }}
         >
-          Explorar
-        </Typography>
+          <Typography component="h1" variant="body2" sx={{ fontWeight: 800 }}>
+            Explorar
+          </Typography>
+        </Box>
       </NavbarTop>
 
-      <Box
-        component="ul"
-        sx={{
-          listStyle: 'none',
-          p: 0,
-          m: 0
-        }}
-      >
+      <Box component="ul" sx={{ listStyle: 'none', p: 0, m: 0, mt: 1 }}>
         {topics.map((topic) => (
           <TrendingTopic
             key={topic.id}
