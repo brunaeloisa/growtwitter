@@ -68,7 +68,7 @@ export function Profile() {
           <Box
             sx={{
               px: 1,
-              height: '100%',
+              minHeight: 'inherit',
               display: 'flex',
               alignItems: 'center',
               borderBottom: 1,
@@ -115,8 +115,9 @@ export function Profile() {
           alignItems="center"
           sx={{
             px: 1,
+            pb: '1px',
             gap: 1,
-            height: 'calc(100% - 1px)',
+            minHeight: 'inherit',
             boxShadow: (theme) =>
               `0 1px 2px rgba(0, 0, 0, ${theme.palette.mode === 'dark' ? 0.4 : 0.08})`
           }}

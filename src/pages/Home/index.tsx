@@ -35,7 +35,7 @@ export function Home() {
       <NavbarTop positionMd="static">
         <Box
           sx={{
-            height: '100%',
+            minHeight: 'inherit',
             display: 'flex',
             alignItems: 'center',
             px: 1.5,
@@ -56,7 +56,7 @@ export function Home() {
           <Typography
             variant="body2"
             sx={{
-              p: 1.5,
+              p: 2,
               justifyContent: 'center',
               display: 'flex',
               alignItems: 'center',

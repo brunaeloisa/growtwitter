@@ -1,5 +1,5 @@
 import { AxiosError } from 'axios';
-import type { UserBackend, UserProfile } from '../types/user.types';
+import type { User, UserBackend, UserProfile } from '../types/user.types';
 import { api } from './api.service';
 import { normalizeTweets } from './tweet.service';
 import type { TweetBackend } from '../types/tweet.types';
@@ -73,5 +73,16 @@ export async function getUserData(userId: string): Promise<{
       imageUrl: null,
       following: []
     };
+  }
+}
+
+export async function getUserList(): Promise<User[]> {
+  try {
+    const response = await api.get('/users');
+    const users: User[] = response.data.data;
+    return [...users].reverse();
+  } catch {
+    console.error('Erro ao buscar lista de usuários.');
+    return [];
   }
 }
