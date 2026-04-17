@@ -1,4 +1,4 @@
-import axios from 'axios';
+import { isAxiosError } from 'axios';
 import type { Tweet, TweetBackend } from '../types/tweet.types';
 import { api } from './api.service';
 
@@ -42,7 +42,7 @@ export async function fetchFeed(currentUserId: string): Promise<Tweet[]> {
 
     return normalizeTweets(response.data.data, currentUserId);
   } catch (error) {
-    if (axios.isAxiosError(error) && error.response?.status === 401) {
+    if (isAxiosError(error) && error.response?.status === 401) {
       console.error('Token inválido ou expirado.');
     } else {
       console.error('Erro ao sincronizar feed.');
@@ -57,7 +57,7 @@ export async function likeTweet(tweetId: string): Promise<boolean> {
     await api.post('/likes', { tweetId });
     return true;
   } catch (error) {
-    if (axios.isAxiosError(error) && error.response?.status === 409) {
+    if (isAxiosError(error) && error.response?.status === 409) {
       return true;
     }
 
@@ -71,7 +71,7 @@ export async function unlikeTweet(tweetId: string): Promise<boolean> {
     await api.delete('/likes', { data: { tweetId } });
     return true;
   } catch (error) {
-    if (axios.isAxiosError(error) && error.response?.status === 404) {
+    if (isAxiosError(error) && error.response?.status === 404) {
       return true;
     }
 
