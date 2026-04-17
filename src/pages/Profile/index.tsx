@@ -1,10 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
 import { useAppSelector } from '../../store/hooks';
-import {
-  followUser,
-  getUserProfileById,
-  unfollowUser
-} from '../../services/user.service';
+import { getUserProfileById } from '../../services/user.service';
 import { useNavigate, useParams } from 'react-router-dom';
 import type { UserProfile } from '../../types/user.types';
 import {
@@ -14,7 +10,6 @@ import {
   Typography,
   IconButton,
   Avatar,
-  Button,
   CircularProgress
 } from '@mui/material';
 import { TweetCard } from '../../components/TweetCard';
@@ -23,6 +18,7 @@ import CropOriginalIcon from '@mui/icons-material/CropOriginal';
 import CalendarMonthOutlinedIcon from '@mui/icons-material/CalendarMonthOutlined';
 import { useOutletContext } from 'react-router-dom';
 import { NavbarTop } from '../../components/NavbarTop';
+import { FollowButton } from '../../components/FollowButton';
 
 function formatAccountCreationDate(dateString: string) {
   const date = new Date(dateString);
@@ -47,13 +43,11 @@ export function Profile() {
   const navigate = useNavigate();
 
   const [loading, setLoading] = useState(true);
-  const [loadingFollow, setLoadingFollow] = useState(false);
   const [user, setUser] = useState<UserProfile | null>(null);
   const { followingList, setFollowingList, profileRefreshKey } =
     useOutletContext<OutletContext>();
 
   const isOwnProfile = loggedUser?.id === userId;
-  const isFollowing = !isOwnProfile && followingList?.includes(userId || '');
 
   const loadProfile = useCallback(() => {
     if (!loggedUser?.id || !userId) return;
@@ -66,33 +60,6 @@ export function Profile() {
   useEffect(() => {
     loadProfile();
   }, [loadProfile, profileRefreshKey]);
-
-  async function handleFollow() {
-    if (!userId || loadingFollow) return;
-
-    setLoadingFollow(true);
-
-    const wasFollowing = isFollowing;
-
-    setFollowingList(
-      wasFollowing
-        ? followingList.filter((id) => id !== userId)
-        : [...followingList, userId]
-    );
-
-    const success = wasFollowing
-      ? await unfollowUser(userId)
-      : await followUser(userId);
-
-    if (!success)
-      setFollowingList(
-        wasFollowing
-          ? [...followingList, userId]
-          : followingList.filter((id) => id !== userId)
-      );
-
-    setLoadingFollow(false);
-  }
 
   if (!user) {
     return (
@@ -234,39 +201,12 @@ export function Profile() {
             </Box>
 
             {!isOwnProfile && (
-              <Button
-                onClick={handleFollow}
-                aria-label={
-                  isFollowing
-                    ? `Deixar de seguir @${user?.username}`
-                    : `Seguir  @${user?.username}`
-                }
-                variant={isFollowing ? 'outlined' : 'contained'}
-                sx={{
-                  height: 32,
-                  borderRadius: 5,
-                  fontWeight: 600,
-                  transition: 'border-color 0.2s ease, color 0.2s ease',
-                  ...(isFollowing
-                    ? {
-                        borderColor: 'text.primary',
-                        color: 'text.primary',
-                        '&:hover': {
-                          borderColor: 'error.main',
-                          color: 'error.main'
-                        }
-                      }
-                    : {
-                        backgroundColor: 'text.primary',
-                        color: 'background.default',
-                        '&:hover': {
-                          backgroundColor: 'text.secondary'
-                        }
-                      })
-                }}
-              >
-                {isFollowing ? 'Seguindo' : 'Seguir'}
-              </Button>
+              <FollowButton
+                userId={user.id}
+                username={user.username}
+                followingList={followingList}
+                setFollowingList={setFollowingList}
+              />
             )}
           </Stack>
 
