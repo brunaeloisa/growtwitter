@@ -16,7 +16,11 @@ import { useEffect, useRef, useState } from 'react';
 import { TabPanel } from '../../components/TabPanel';
 import type { User } from '../../types/user.types';
 import { getUserList } from '../../services/user.service';
-import { Link as RouterLink, useOutletContext } from 'react-router-dom';
+import {
+  Link as RouterLink,
+  useOutletContext,
+  useSearchParams
+} from 'react-router-dom';
 import { FollowButton } from '../../components/FollowButton';
 import { useAppSelector } from '../../store/hooks';
 
@@ -36,13 +40,14 @@ const tabStyle = {
 };
 
 export function Explore() {
-  const [tabValue, setTabValue] = useState(0);
+  const [searchParams, setSearchParams] = useSearchParams();
   const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
   const { followingList, setFollowingList } = useOutletContext<OutletContext>();
 
   const isLoaded = useRef(false);
   const loggedUserId = useAppSelector((state) => state.auth.user?.id);
+  const tabValue = searchParams.get('tab') === 'who-to-follow' ? 1 : 0;
 
   useEffect(() => {
     if (isLoaded.current || followingList.length === 0) return;
@@ -85,9 +90,11 @@ export function Explore() {
     </Box>
   );
 
-  function handleTabChange(_event: React.SyntheticEvent, newValue: number) {
-    setTabValue(newValue);
-  }
+  const handleTabChange = (_: React.SyntheticEvent, newValue: number) => {
+    setSearchParams(newValue === 1 ? { tab: 'who-to-follow' } : {}, {
+      replace: true
+    });
+  };
 
   function accessibilityProps(index: number) {
     return {

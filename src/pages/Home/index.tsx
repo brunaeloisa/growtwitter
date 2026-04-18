@@ -1,5 +1,6 @@
 import {
   Box,
+  Button,
   CircularProgress,
   Divider,
   Stack,
@@ -11,6 +12,7 @@ import { useAppSelector } from '../../store/hooks';
 import type { Tweet } from '../../types/tweet.types';
 import { TweetThread } from '../../components/TweetThread';
 import { NavbarTop } from '../../components/NavbarTop';
+import { Link as RouterLink } from 'react-router-dom';
 
 export function Home() {
   const { user } = useAppSelector((state) => state.auth);
@@ -75,9 +77,24 @@ export function Home() {
             />
           ))
         ) : (
-          <Typography variant="body2" sx={{ p: 1.5, textAlign: 'center' }}>
-            Nada por aqui ainda. Siga pessoas para ver growtweets no seu feed!
-          </Typography>
+          <Box sx={{ textAlign: 'center', p: 3 }}>
+            <Typography variant="body2" sx={{ mb: 2 }}>
+              Nada por aqui ainda. Siga pessoas para ver growtweets no seu feed!
+            </Typography>
+
+            <Button
+              component={RouterLink}
+              to="/explore?tab=who-to-follow"
+              variant="outlined"
+              sx={{
+                borderRadius: '20px',
+                textTransform: 'none',
+                fontWeight: '600'
+              }}
+            >
+              Encontrar pessoas
+            </Button>
+          </Box>
         )}
       </Stack>
 
