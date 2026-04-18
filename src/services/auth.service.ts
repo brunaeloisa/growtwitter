@@ -1,6 +1,6 @@
 import { api } from './api.service';
 import type { ResponseLogin } from '../types/auth.types.ts';
-import { AxiosError } from 'axios';
+import { isAxiosError } from 'axios';
 
 export async function login(
   username: string,
@@ -16,15 +16,15 @@ export async function login(
         token: authToken
       }
     };
-  } catch (err) {
+  } catch (error) {
     if (
-      err instanceof AxiosError &&
-      (err.response?.status === 401 || err.response?.status === 404)
+      isAxiosError(error) &&
+      (error.response?.status === 401 || error.response?.status === 404)
     ) {
       return { error: 'Credenciais inválidas.' };
     }
 
-    console.error('Erro no login:', err);
+    console.error('Erro no login:', error);
 
     return { error: 'Erro no login. Tente novamente.' };
   }

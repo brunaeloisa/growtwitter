@@ -77,7 +77,7 @@ export function TweetDetail() {
             gap: 1,
             borderBottom: 1,
             borderColor: 'divider',
-            height: '100%'
+            minHeight: 'inherit'
           }}
         >
           <IconButton

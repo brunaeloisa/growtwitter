@@ -1,5 +1,5 @@
-import { AxiosError } from 'axios';
-import type { UserBackend, UserProfile } from '../types/user.types';
+import { isAxiosError } from 'axios';
+import type { User, UserBackend, UserProfile } from '../types/user.types';
 import { api } from './api.service';
 import { normalizeTweets } from './tweet.service';
 import type { TweetBackend } from '../types/tweet.types';
@@ -25,11 +25,11 @@ export async function getUserProfileById(
         currentUserId
       )
     };
-  } catch (err) {
-    if (err instanceof AxiosError && err.response?.status === 401) {
+  } catch (error) {
+    if (isAxiosError(error) && error.response?.status === 401) {
       console.error('Token inválido ou expirado.');
     } else {
-      console.error(err);
+      console.error(error);
     }
     return null;
   }
@@ -39,7 +39,11 @@ export async function followUser(userId: string): Promise<boolean> {
   try {
     await api.post('/followers', { userId });
     return true;
-  } catch {
+  } catch (error) {
+    if (isAxiosError(error) && error.response?.status === 409) {
+      return true;
+    }
+
     console.error(`Erro ao seguir o usuário ${userId}.`);
     return false;
   }
@@ -49,7 +53,10 @@ export async function unfollowUser(userId: string): Promise<boolean> {
   try {
     await api.delete('/followers', { data: { userId } });
     return true;
-  } catch {
+  } catch (error) {
+    if (isAxiosError(error) && error.response?.status === 404) {
+      return true;
+    }
     console.error(`Erro ao deixar de seguir o usuário ${userId}.`);
     return false;
   }
@@ -73,5 +80,16 @@ export async function getUserData(userId: string): Promise<{
       imageUrl: null,
       following: []
     };
+  }
+}
+
+export async function getUserList(): Promise<User[]> {
+  try {
+    const response = await api.get('/users');
+    const users: User[] = response.data.data;
+    return [...users].reverse();
+  } catch {
+    console.error('Erro ao buscar lista de usuários.');
+    return [];
   }
 }
