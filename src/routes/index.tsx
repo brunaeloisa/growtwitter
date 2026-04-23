@@ -3,6 +3,7 @@ import { Home } from '../pages/Home';
 import { Profile } from '../pages/Profile';
 import { Explore } from '../pages/Explore';
 import { Login } from '../pages/Login';
+import { Register } from '../pages/Register';
 import { MainLayout } from '../layouts/MainLayout';
 import { TweetDetail } from '../pages/TweetDetail';
 import { AuthLayout } from '../layouts/AuthLayout';
@@ -10,7 +11,10 @@ import { AuthLayout } from '../layouts/AuthLayout';
 export const router = createBrowserRouter([
   {
     element: <AuthLayout />,
-    children: [{ path: 'login', element: <Login /> }]
+    children: [
+      { path: 'login', element: <Login /> },
+      { path: 'register', element: <Register /> }
+    ]
   },
   {
     path: '/',

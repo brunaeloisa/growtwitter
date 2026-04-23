@@ -1,15 +1,28 @@
 import { Box, Button, CircularProgress, TextField } from '@mui/material';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { CustomSnackbar } from '../../components/CustomSnackbar';
 import { loginThunk } from '../../store/auth/auth.thunk';
 import { useAppDispatch, useAppSelector } from '../../store/hooks';
+import type { AuthContextType } from '../../layouts/AuthLayout';
+import { useLocation, useOutletContext } from 'react-router-dom';
 
 export function Login() {
   const dispatch = useAppDispatch();
   const { loading, error } = useAppSelector((state) => state.auth);
-  const [username, setUsername] = useState('');
+  const location = useLocation();
+
+  const [username, setUsername] = useState(location.state?.username || '');
   const [password, setPassword] = useState('');
   const [snackbarOpen, setSnackbarOpen] = useState(false);
+  const { setAuthPrompt } = useOutletContext<AuthContextType>();
+
+  useEffect(() => {
+    setAuthPrompt({
+      text: 'Não tem uma conta?',
+      linkText: 'Cadastre-se.',
+      path: '/register'
+    });
+  }, [setAuthPrompt]);
 
   async function handleLogin(e: React.SubmitEvent<HTMLFormElement>) {
     e.preventDefault();
