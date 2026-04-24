@@ -1,34 +1,28 @@
-import { loginThunk } from '../../store/auth/auth.thunk';
-import { Navigate } from 'react-router-dom';
-import { toggleTheme } from '../../store/theme/theme.slice';
-import Brightness4Icon from '@mui/icons-material/Brightness4';
-import logoDark from '../../assets/logo-dark.svg';
-import logoLight from '../../assets/logo-light.svg';
-import {
-  Box,
-  Button,
-  CircularProgress,
-  Container,
-  IconButton,
-  Paper,
-  TextField,
-  useTheme
-} from '@mui/material';
-import { useAppDispatch, useAppSelector } from '../../store/hooks';
-import { useState } from 'react';
+import { Box, Button, CircularProgress, TextField } from '@mui/material';
+import { useEffect, useState } from 'react';
 import { CustomSnackbar } from '../../components/CustomSnackbar';
+import { loginThunk } from '../../store/auth/auth.thunk';
+import { useAppDispatch, useAppSelector } from '../../store/hooks';
+import type { AuthContextType } from '../../layouts/AuthLayout';
+import { useLocation, useOutletContext } from 'react-router-dom';
 
 export function Login() {
   const dispatch = useAppDispatch();
-  const theme = useTheme();
-  const { user, token, loading, error } = useAppSelector((state) => state.auth);
-  const [username, setUsername] = useState('');
+  const { loading, error } = useAppSelector((state) => state.auth);
+  const location = useLocation();
+
+  const [username, setUsername] = useState(location.state?.username || '');
   const [password, setPassword] = useState('');
   const [snackbarOpen, setSnackbarOpen] = useState(false);
+  const { setAuthPrompt } = useOutletContext<AuthContextType>();
 
-  if (user && token) {
-    return <Navigate to="/" replace />;
-  }
+  useEffect(() => {
+    setAuthPrompt({
+      text: 'Não tem uma conta?',
+      linkText: 'Cadastre-se.',
+      path: '/register'
+    });
+  }, [setAuthPrompt]);
 
   async function handleLogin(e: React.SubmitEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -39,100 +33,60 @@ export function Login() {
     }
   }
 
-  function handleThemeToggle() {
-    dispatch(toggleTheme());
-  }
-
   return (
     <>
-      <Container maxWidth="sm" sx={{ p: 1 }}>
-        <Box
-          sx={{
-            minHeight: '100vh',
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center'
+      <Box component="form" onSubmit={handleLogin}>
+        <TextField
+          fullWidth
+          label="Usuário"
+          variant="outlined"
+          margin="normal"
+          value={username}
+          onChange={(e) => setUsername(e.target.value)}
+          required
+          slotProps={{
+            inputLabel: { required: false }
           }}
+          disabled={loading}
+        />
+
+        <TextField
+          fullWidth
+          label="Senha"
+          type="password"
+          variant="outlined"
+          margin="normal"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          required
+          slotProps={{
+            inputLabel: { required: false }
+          }}
+          disabled={loading}
+        />
+
+        <Button
+          type="submit"
+          fullWidth
+          variant="contained"
+          size="large"
+          sx={{ my: 2, borderRadius: 2, p: 1.25, fontSize: '1rem' }}
+          disabled={!username || !password || loading}
         >
-          <Paper
-            elevation={3}
-            aria-label="Entrar no GrowTwitter"
-            sx={{
-              p: { xs: 3, sm: 4 },
-              width: '90%',
-              borderRadius: 2
-            }}
-          >
-            <Box sx={{ textAlign: 'center', p: 1, mb: { xs: 0, sm: 1.5 } }}>
-              <Box
-                component="img"
-                src={theme.palette.mode === 'dark' ? logoDark : logoLight}
-                alt="growtweet"
-                sx={{ height: { xs: 30, sm: 40 }, maxWidth: '100%' }}
+          {loading ? (
+            <>
+              <CircularProgress
+                size="1em"
+                color="inherit"
+                sx={{ verticalAlign: 'middle', mr: 1 }}
               />
-            </Box>
-
-            <Box component="form" onSubmit={handleLogin}>
-              <TextField
-                fullWidth
-                label="Usuário"
-                variant="outlined"
-                margin="normal"
-                value={username}
-                onChange={(e) => setUsername(e.target.value)}
-                required
-                slotProps={{
-                  inputLabel: { required: false }
-                }}
-              />
-
-              <TextField
-                fullWidth
-                label="Senha"
-                type="password"
-                variant="outlined"
-                margin="normal"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-                slotProps={{
-                  inputLabel: { required: false }
-                }}
-              />
-
-              <Button
-                type="submit"
-                fullWidth
-                variant="contained"
-                size="large"
-                sx={{ my: 2, borderRadius: 2, p: 1.25, fontSize: '1rem' }}
-                disabled={!username || !password || loading}
-              >
-                {loading ? (
-                  <>
-                    <CircularProgress
-                      size="1em"
-                      color="inherit"
-                      sx={{ verticalAlign: 'middle', mr: 1 }}
-                    />
-                    Entrando...
-                  </>
-                ) : (
-                  'Entrar'
-                )}
-              </Button>
-            </Box>
-          </Paper>
-        </Box>
-      </Container>
-
-      <IconButton
-        aria-label="Trocar tema"
-        onClick={handleThemeToggle}
-        sx={{ position: 'absolute', top: 10, right: 10 }}
-      >
-        <Brightness4Icon />
-      </IconButton>
+              Entrando...
+            </>
+          ) : (
+            'Entrar'
+          )}
+        </Button>
+      </Box>
 
       <CustomSnackbar
         open={snackbarOpen}
