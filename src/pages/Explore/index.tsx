@@ -50,7 +50,7 @@ export function Explore() {
   const tabValue = searchParams.get('tab') === 'who-to-follow' ? 1 : 0;
 
   useEffect(() => {
-    if (isLoaded.current || followingList.length === 0) return;
+    if (isLoaded.current) return;
 
     getUserList()
       .then((data) => {
