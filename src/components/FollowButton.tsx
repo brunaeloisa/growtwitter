@@ -7,13 +7,15 @@ interface FollowButtonProps {
   username: string;
   followingList: string[];
   setFollowingList: React.Dispatch<React.SetStateAction<string[]>>;
+  onToggleFollow?: (isFollowing: boolean) => void;
 }
 
 export function FollowButton({
   userId,
   username,
   followingList,
-  setFollowingList
+  setFollowingList,
+  onToggleFollow
 }: FollowButtonProps) {
   const [loading, setLoading] = useState(false);
   const isFollowing = followingList.includes(userId);
@@ -31,16 +33,21 @@ export function FollowButton({
         : [...prevList, userId]
     );
 
+    onToggleFollow?.(!wasFollowing);
+
     const success = wasFollowing
       ? await unfollowUser(userId)
       : await followUser(userId);
 
-    if (!success)
+    if (!success) {
       setFollowingList((prevList) =>
         wasFollowing
           ? [...prevList, userId]
           : prevList.filter((id) => id !== userId)
       );
+
+      onToggleFollow?.(wasFollowing);
+    }
 
     setLoading(false);
   }

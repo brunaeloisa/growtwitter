@@ -61,6 +61,17 @@ export function Profile() {
     loadProfile();
   }, [loadProfile, profileRefreshKey]);
 
+  const handleFollowChange = (isFollowing: boolean) => {
+    setUser((prev) => {
+      if (!prev) return prev;
+
+      return {
+        ...prev,
+        followersCount: prev.followersCount + (isFollowing ? 1 : -1)
+      };
+    });
+  };
+
   if (!user) {
     return (
       <>
@@ -207,6 +218,7 @@ export function Profile() {
                 username={user.username}
                 followingList={followingList}
                 setFollowingList={setFollowingList}
+                onToggleFollow={handleFollowChange}
               />
             )}
           </Stack>
