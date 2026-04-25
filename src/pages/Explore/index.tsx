@@ -27,6 +27,7 @@ import { useAppSelector } from '../../store/hooks';
 interface OutletContext {
   followingList: string[];
   setFollowingList: React.Dispatch<React.SetStateAction<string[]>>;
+  isFollowingLoaded: boolean;
 }
 
 const tabStyle = {
@@ -43,14 +44,14 @@ export function Explore() {
   const [searchParams, setSearchParams] = useSearchParams();
   const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
-  const { followingList, setFollowingList } = useOutletContext<OutletContext>();
-
-  const isLoaded = useRef(false);
+  const { followingList, setFollowingList, isFollowingLoaded } =
+    useOutletContext<OutletContext>();
+  const hasFetchedUsers = useRef(false);
   const loggedUserId = useAppSelector((state) => state.auth.user?.id);
   const tabValue = searchParams.get('tab') === 'who-to-follow' ? 1 : 0;
 
   useEffect(() => {
-    if (isLoaded.current) return;
+    if (!isFollowingLoaded || hasFetchedUsers.current) return;
 
     getUserList()
       .then((data) => {
@@ -62,13 +63,10 @@ export function Explore() {
         );
 
         setUsers(filteredUsers);
-
-        if (data.length > 0) {
-          isLoaded.current = true;
-        }
+        hasFetchedUsers.current = true;
       })
       .finally(() => setLoading(false));
-  }, [followingList, loggedUserId]);
+  }, [followingList, isFollowingLoaded, loggedUserId]);
 
   const activeLabel = (texto: string, active: boolean) => (
     <Box sx={{ position: 'relative', display: 'inline-block', px: 0.5 }}>

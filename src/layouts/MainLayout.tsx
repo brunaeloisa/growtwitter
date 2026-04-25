@@ -24,6 +24,7 @@ export function MainLayout() {
   const [modalOpen, setModalOpen] = useState(false);
   const [openMenu, setOpenMenu] = useState(false);
   const [followingList, setFollowingList] = useState<string[]>([]);
+  const [isFollowingLoaded, setIsFollowingLoaded] = useState(false);
   const [profileRefreshKey, setProfileRefreshKey] = useState(0);
   const dispatch = useAppDispatch();
 
@@ -32,6 +33,7 @@ export function MainLayout() {
 
     getUserData(user.id).then(({ imageUrl, following }) => {
       setFollowingList(following);
+      setIsFollowingLoaded(true);
 
       if (imageUrl) {
         dispatch(updateUserImage(imageUrl));
@@ -109,7 +111,12 @@ export function MainLayout() {
         }}
       >
         <Outlet
-          context={{ profileRefreshKey, followingList, setFollowingList }}
+          context={{
+            profileRefreshKey,
+            followingList,
+            setFollowingList,
+            isFollowingLoaded
+          }}
         />
       </Box>
 
