@@ -1,24 +1,25 @@
-import { useCallback, useEffect, useState } from 'react';
-import { useAppSelector } from '../../store/hooks';
-import { getUserProfileById } from '../../services/user.service';
-import { useNavigate, useParams } from 'react-router-dom';
-import type { UserProfile } from '../../types/user.types';
-import {
-  Box,
-  Divider,
-  Stack,
-  Typography,
-  IconButton,
-  Avatar,
-  CircularProgress
-} from '@mui/material';
-import { TweetCard } from '../../components/TweetCard';
-import KeyboardBackspaceIcon from '@mui/icons-material/KeyboardBackspace';
-import CropOriginalIcon from '@mui/icons-material/CropOriginal';
 import CalendarMonthOutlinedIcon from '@mui/icons-material/CalendarMonthOutlined';
-import { useOutletContext } from 'react-router-dom';
-import { NavbarTop } from '../../components/NavbarTop';
+import CropOriginalIcon from '@mui/icons-material/CropOriginal';
+import KeyboardBackspaceIcon from '@mui/icons-material/KeyboardBackspace';
+import {
+  Avatar,
+  Box,
+  ButtonBase,
+  CircularProgress,
+  Divider,
+  IconButton,
+  Stack,
+  Typography
+} from '@mui/material';
+import { useCallback, useEffect, useState } from 'react';
+import { useNavigate, useOutletContext, useParams } from 'react-router-dom';
 import { FollowButton } from '../../components/FollowButton';
+import { FollowersModal } from '../../components/FollowersModal';
+import { NavbarTop } from '../../components/NavbarTop';
+import { TweetCard } from '../../components/TweetCard';
+import { getUserProfileById } from '../../services/user.service';
+import { useAppSelector } from '../../store/hooks';
+import type { UserProfile } from '../../types/user.types';
 
 function formatAccountCreationDate(dateString: string) {
   const date = new Date(dateString);
@@ -44,6 +45,11 @@ export function Profile() {
 
   const [loading, setLoading] = useState(true);
   const [user, setUser] = useState<UserProfile | null>(null);
+  const [openFollowersModal, setOpenFollowersModal] = useState(false);
+  const [modalType, setModalType] = useState<'followers' | 'following' | null>(
+    null
+  );
+
   const { followingList, setFollowingList, profileRefreshKey } =
     useOutletContext<OutletContext>();
 
@@ -54,7 +60,10 @@ export function Profile() {
 
     getUserProfileById(userId, loggedUser.id)
       .then(setUser)
-      .finally(() => setLoading(false));
+      .finally(() => {
+        setLoading(false);
+        setOpenFollowersModal(false);
+      });
   }, [userId, loggedUser]);
 
   useEffect(() => {
@@ -235,33 +244,47 @@ export function Profile() {
           </Typography>
 
           <Stack direction="row" gap={2} pt={1.5} pb={1} ml={0.3}>
-            <Typography
-              fontSize={10}
-              color="text.disabled"
-              sx={{ fontWeight: 500 }}
+            <ButtonBase
+              onClick={() => {
+                setOpenFollowersModal(true);
+                setModalType('following');
+              }}
             >
-              <Box
-                component="span"
-                sx={{ fontWeight: 600, color: 'text.primary', pr: 0.5 }}
+              <Typography
+                fontSize={10}
+                color="text.disabled"
+                sx={{ fontWeight: 500 }}
               >
-                {user.followingCount}
-              </Box>
-              Seguindo
-            </Typography>
+                <Box
+                  component="span"
+                  sx={{ fontWeight: 600, color: 'text.primary', pr: 0.5 }}
+                >
+                  {user.followingCount}
+                </Box>
+                Seguindo
+              </Typography>
+            </ButtonBase>
 
-            <Typography
-              fontSize={10}
-              color="text.disabled"
-              sx={{ fontWeight: 500 }}
+            <ButtonBase
+              onClick={() => {
+                setOpenFollowersModal(true);
+                setModalType('followers');
+              }}
             >
-              <Box
-                component="span"
-                sx={{ fontWeight: 600, color: 'text.primary', pr: 0.5 }}
+              <Typography
+                fontSize={10}
+                color="text.disabled"
+                sx={{ fontWeight: 500 }}
               >
-                {user.followersCount}
-              </Box>
-              Seguidores
-            </Typography>
+                <Box
+                  component="span"
+                  sx={{ fontWeight: 600, color: 'text.primary', pr: 0.5 }}
+                >
+                  {user.followersCount}
+                </Box>
+                Seguidores
+              </Typography>
+            </ButtonBase>
           </Stack>
         </Box>
       </Box>
@@ -282,6 +305,17 @@ export function Profile() {
 
       {user.tweets.length > 0 && (
         <Divider flexItem sx={{ borderBottomWidth: 1, my: 0 }} />
+      )}
+
+      {modalType && (
+        <FollowersModal
+          open={openFollowersModal}
+          onClose={() => setOpenFollowersModal(false)}
+          title={modalType === 'followers' ? 'Seguidores' : 'Seguindo'}
+          users={user[modalType]}
+          followingList={followingList}
+          setFollowingList={setFollowingList}
+        />
       )}
     </>
   );

@@ -4,6 +4,15 @@ import { api } from './api.service';
 import { normalizeTweets } from './tweet.service';
 import type { TweetBackend } from '../types/tweet.types';
 
+function normalizeUsers(users: UserBackend[]): User[] {
+  return users.map((user) => ({
+    id: user.id,
+    name: user.name,
+    username: user.username,
+    imageUrl: user.imageUrl
+  }));
+}
+
 export async function getUserProfileById(
   userId: string,
   currentUserId: string
@@ -20,6 +29,8 @@ export async function getUserProfileById(
       createdAt: user.createdAt,
       followersCount: user.followers.length,
       followingCount: user.following.length,
+      followers: normalizeUsers(user.followers),
+      following: normalizeUsers(user.following),
       tweets: normalizeTweets(
         user.tweets.filter((tweet: TweetBackend) => tweet.type === 'NORMAL'),
         currentUserId
