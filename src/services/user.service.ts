@@ -27,8 +27,6 @@ export async function getUserProfileById(
       name: user.name,
       imageUrl: user.imageUrl,
       createdAt: user.createdAt,
-      followersCount: user.followers.length,
-      followingCount: user.following.length,
       followers: normalizeUsers(user.followers),
       following: normalizeUsers(user.following),
       tweets: normalizeTweets(
@@ -101,6 +99,16 @@ export async function getUserList(): Promise<User[]> {
     return [...users].reverse();
   } catch {
     console.error('Erro ao buscar lista de usuários.');
+    return [];
+  }
+}
+
+export async function getFollowingUsers(): Promise<User[]> {
+  try {
+    const response = await api.get('/followers');
+    return response.data.data.followings;
+  } catch {
+    console.error('Erro ao buscar lista de usuários seguidos.');
     return [];
   }
 }

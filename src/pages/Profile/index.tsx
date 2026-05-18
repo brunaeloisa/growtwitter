@@ -17,7 +17,10 @@ import { FollowButton } from '../../components/FollowButton';
 import { FollowersModal } from '../../components/FollowersModal';
 import { NavbarTop } from '../../components/NavbarTop';
 import { TweetCard } from '../../components/TweetCard';
-import { getUserProfileById } from '../../services/user.service';
+import {
+  getFollowingUsers,
+  getUserProfileById
+} from '../../services/user.service';
 import { useAppSelector } from '../../store/hooks';
 import type { UserProfile } from '../../types/user.types';
 
@@ -70,13 +73,40 @@ export function Profile() {
     loadProfile();
   }, [loadProfile, profileRefreshKey]);
 
+  useEffect(() => {
+    if (!user || !isOwnProfile) return;
+
+    const followingIds = user.following.map((user) => user.id);
+
+    const hasDifferentFollowing =
+      followingIds.some((id) => !followingList.includes(id)) ||
+      followingList.some((id) => !followingIds.includes(id));
+
+    if (hasDifferentFollowing) {
+      getFollowingUsers().then((updatedFollowing) => {
+        setUser((prev) => {
+          if (!prev) return prev;
+
+          return {
+            ...prev,
+            following: updatedFollowing
+          };
+        });
+      });
+    }
+  }, [followingList, isOwnProfile, user]);
+
   const handleFollowChange = (isFollowing: boolean) => {
+    if (!loggedUser) return;
+
     setUser((prev) => {
       if (!prev) return prev;
 
       return {
         ...prev,
-        followersCount: prev.followersCount + (isFollowing ? 1 : -1)
+        followers: isFollowing
+          ? [...prev.followers, loggedUser]
+          : prev.followers.filter((user) => user.id !== loggedUser.id)
       };
     });
   };
@@ -259,7 +289,7 @@ export function Profile() {
                   component="span"
                   sx={{ fontWeight: 600, color: 'text.primary', pr: 0.5 }}
                 >
-                  {user.followingCount}
+                  {user.following.length}
                 </Box>
                 Seguindo
               </Typography>
@@ -280,7 +310,7 @@ export function Profile() {
                   component="span"
                   sx={{ fontWeight: 600, color: 'text.primary', pr: 0.5 }}
                 >
-                  {user.followersCount}
+                  {user.followers.length}
                 </Box>
                 Seguidores
               </Typography>

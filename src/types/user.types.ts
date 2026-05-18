@@ -9,8 +9,6 @@ export interface User {
 
 export interface UserProfile extends User {
   createdAt: string;
-  followersCount: number;
-  followingCount: number;
   followers: User[];
   following: User[];
   tweets: Tweet[];

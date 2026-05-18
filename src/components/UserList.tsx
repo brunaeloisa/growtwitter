@@ -3,6 +3,7 @@ import { Link as RouterLink } from 'react-router-dom';
 import CropOriginalIcon from '@mui/icons-material/CropOriginal';
 import type { User } from '../types/user.types';
 import { FollowButton } from './FollowButton';
+import { useAppSelector } from '../store/hooks';
 
 interface UserListProps {
   users: User[];
@@ -15,6 +16,8 @@ export function UserList({
   followingList,
   setFollowingList
 }: UserListProps) {
+  const loggedUserId = useAppSelector((state) => state.auth.user?.id);
+
   return (
     <>
       {users.map((user) => (
@@ -79,12 +82,14 @@ export function UserList({
             </Box>
           </Link>
 
-          <FollowButton
-            userId={user.id}
-            username={user.username}
-            followingList={followingList}
-            setFollowingList={setFollowingList}
-          />
+          {user.id !== loggedUserId && (
+            <FollowButton
+              userId={user.id}
+              username={user.username}
+              followingList={followingList}
+              setFollowingList={setFollowingList}
+            />
+          )}
         </Stack>
       ))}
     </>
