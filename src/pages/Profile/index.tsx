@@ -42,6 +42,11 @@ interface OutletContext {
 }
 
 export function Profile() {
+  const { id } = useParams<{ id: string }>();
+  return <ProfilePage key={id} />;
+}
+
+function ProfilePage() {
   const loggedUser = useAppSelector((state) => state.auth.user);
   const { id: userId } = useParams<{ id: string }>();
   const navigate = useNavigate();
@@ -63,10 +68,7 @@ export function Profile() {
 
     getUserProfileById(userId, loggedUser.id)
       .then(setUser)
-      .finally(() => {
-        setLoading(false);
-        setOpenFollowersModal(false);
-      });
+      .finally(() => setLoading(false));
   }, [userId, loggedUser]);
 
   useEffect(() => {
