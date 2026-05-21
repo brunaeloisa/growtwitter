@@ -2,10 +2,8 @@ import {
   Box,
   CircularProgress,
   Stack,
-  styled,
   Tab,
   Tabs,
-  TextField,
   Typography
 } from '@mui/material';
 import { useEffect, useMemo, useRef, useState } from 'react';
@@ -18,43 +16,13 @@ import { topics } from '../../data/trendingTopics';
 import { getUserList } from '../../services/user.service';
 import { useAppSelector } from '../../store/hooks';
 import type { User } from '../../types/user.types';
+import { SearchInput } from '../../components/SearchInput';
 
 interface OutletContext {
   followingList: string[];
   setFollowingList: React.Dispatch<React.SetStateAction<string[]>>;
   isFollowingLoaded: boolean;
 }
-
-const SearchField = styled(TextField)(({ theme }) => ({
-  '& .MuiOutlinedInput-root': {
-    borderRadius: '50px',
-
-    '& fieldset': {
-      borderColor: theme.palette.divider
-    },
-
-    '&:hover fieldset': {
-      borderColor: theme.palette.text.disabled
-    },
-
-    '&.Mui-focused fieldset': {
-      borderColor: theme.palette.text.secondary
-    },
-
-    '& .MuiOutlinedInput-notchedOutline': {
-      borderWidth: '1px'
-    }
-  },
-
-  '& .MuiInputLabel-root.Mui-focused': {
-    color: theme.palette.text.primary
-  },
-
-  '& .MuiInputBase-input': {
-    padding: '0.75rem 1.125rem',
-    fontSize: '0.8125rem'
-  }
-}));
 
 const tabStyle = {
   fontSize: '12px',
@@ -262,18 +230,23 @@ export function Explore() {
       <TabPanel value={tabValue} index={2} prefix="explore">
         <Stack direction="column">
           <Box sx={{ p: 1.5, pt: 2 }}>
-            <SearchField
-              fullWidth
-              id="searchInput"
-              placeholder="Buscar usuário..."
-              value={searchInput}
-              onChange={(event: React.ChangeEvent<HTMLInputElement>) => {
-                setSearchInput(event.target.value);
-              }}
-            />
+            <SearchInput value={searchInput} onValueChange={setSearchInput} />
           </Box>
 
-          {filteredUsers.length === 0 ? (
+          {loading ? (
+            <Typography
+              variant="body2"
+              sx={{
+                p: 1.5,
+                justifyContent: 'center',
+                display: 'flex',
+                alignItems: 'center',
+                gap: 0.75
+              }}
+            >
+              <CircularProgress size="14px" color="inherit" /> Carregando...
+            </Typography>
+          ) : filteredUsers.length === 0 ? (
             <Typography
               variant="body2"
               color="text.secondary"
