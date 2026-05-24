@@ -4,10 +4,16 @@ import {
   Drawer,
   IconButton,
   Link,
+  Stack,
   Typography
 } from '@mui/material';
 import { useEffect, useState } from 'react';
-import { Navigate, Outlet, Link as RouterLink } from 'react-router-dom';
+import {
+  Navigate,
+  Outlet,
+  Link as RouterLink,
+  useNavigate
+} from 'react-router-dom';
 import { Sidebar } from '../components/Sidebar';
 import { TrendingTopic } from '../components/TrendingTopic';
 import TweetModal from '../components/TweetModal';
@@ -17,16 +23,19 @@ import { useAppSelector } from '../store/hooks';
 import MenuIcon from '@mui/icons-material/Menu';
 import { useAppDispatch } from '../store/hooks';
 import { updateUserImage } from '../store/auth/auth.slice';
+import { SearchInput } from '../components/SearchInput';
 
 export function MainLayout() {
   const { user, token } = useAppSelector((state) => state.auth);
   const sidebarTopics = topics.slice(0, 5);
+  const [search, setSearch] = useState('');
   const [modalOpen, setModalOpen] = useState(false);
   const [openMenu, setOpenMenu] = useState(false);
   const [followingList, setFollowingList] = useState<string[]>([]);
   const [isFollowingLoaded, setIsFollowingLoaded] = useState(false);
   const [profileRefreshKey, setProfileRefreshKey] = useState(0);
   const dispatch = useAppDispatch();
+  const navigate = useNavigate();
 
   useEffect(() => {
     if (!user?.id) return;
@@ -120,16 +129,26 @@ export function MainLayout() {
         />
       </Box>
 
-      <Box
+      <Stack
         component="aside"
         sx={{
           width: 300,
           p: 2,
           position: 'sticky',
           top: 0,
-          display: { xs: 'none', lg: 'block' }
+          display: { xs: 'none', lg: 'flex' },
+          gap: 2
         }}
       >
+        <SearchInput
+          value={search}
+          onValueChange={setSearch}
+          onSearch={(value) => {
+            navigate('/explore?tab=search', { state: { query: value } });
+            setSearch('');
+          }}
+        />
+
         <Box
           sx={{
             backgroundColor: 'background.paper',
@@ -174,7 +193,7 @@ export function MainLayout() {
             Mostrar mais
           </Link>
         </Box>
-      </Box>
+      </Stack>
 
       <TweetModal
         mode="NORMAL"

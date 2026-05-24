@@ -7,7 +7,11 @@ import {
   Typography
 } from '@mui/material';
 import { useEffect, useMemo, useRef, useState } from 'react';
-import { useOutletContext, useSearchParams } from 'react-router-dom';
+import {
+  useLocation,
+  useOutletContext,
+  useSearchParams
+} from 'react-router-dom';
 import { NavbarTop } from '../../components/NavbarTop';
 import { TabPanel } from '../../components/TabPanel';
 import { TrendingTopic } from '../../components/TrendingTopic';
@@ -37,9 +41,11 @@ const tabStyle = {
 export function Explore() {
   const loggedUserId = useAppSelector((state) => state.auth.user?.id);
 
-  const [loading, setLoading] = useState(true);
-  const [searchInput, setSearchInput] = useState('');
+  const location = useLocation();
+  const initialSearch = location.state?.query ?? '';
+  const [searchInput, setSearchInput] = useState(initialSearch);
 
+  const [loading, setLoading] = useState(true);
   const [users, setUsers] = useState<User[]>([]);
   const [followSuggestions, setFollowSuggestions] = useState<User[]>([]);
 
