@@ -41,9 +41,8 @@ const tabStyle = {
 export function Explore() {
   const loggedUserId = useAppSelector((state) => state.auth.user?.id);
 
-  const location = useLocation();
-  const initialSearch = location.state?.query ?? '';
-  const [searchInput, setSearchInput] = useState(initialSearch);
+  const query = useLocation().state?.query;
+  const [searchInput, setSearchInput] = useState(query ?? '');
 
   const [loading, setLoading] = useState(true);
   const [users, setUsers] = useState<User[]>([]);
