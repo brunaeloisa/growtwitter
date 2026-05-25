@@ -6,8 +6,12 @@ import {
   Tabs,
   Typography
 } from '@mui/material';
-import { useEffect, useRef, useState } from 'react';
-import { useOutletContext, useSearchParams } from 'react-router-dom';
+import { useEffect, useMemo, useRef, useState } from 'react';
+import {
+  useLocation,
+  useOutletContext,
+  useSearchParams
+} from 'react-router-dom';
 import { NavbarTop } from '../../components/NavbarTop';
 import { TabPanel } from '../../components/TabPanel';
 import { TrendingTopic } from '../../components/TrendingTopic';
@@ -16,6 +20,7 @@ import { topics } from '../../data/trendingTopics';
 import { getUserList } from '../../services/user.service';
 import { useAppSelector } from '../../store/hooks';
 import type { User } from '../../types/user.types';
+import { SearchInput } from '../../components/SearchInput';
 
 interface OutletContext {
   followingList: string[];
@@ -34,28 +39,39 @@ const tabStyle = {
 };
 
 export function Explore() {
-  const [searchParams, setSearchParams] = useSearchParams();
-  const [users, setUsers] = useState<User[]>([]);
+  const loggedUserId = useAppSelector((state) => state.auth.user?.id);
+
+  const query = useLocation().state?.query;
+  const [searchInput, setSearchInput] = useState(query ?? '');
+
   const [loading, setLoading] = useState(true);
+  const [users, setUsers] = useState<User[]>([]);
+  const [followSuggestions, setFollowSuggestions] = useState<User[]>([]);
+
+  const [searchParams, setSearchParams] = useSearchParams();
+  const tabParam = searchParams.get('tab');
+  const tabValue =
+    tabParam === 'who-to-follow' ? 1 : tabParam === 'search' ? 2 : 0;
+
   const { followingList, setFollowingList, isFollowingLoaded } =
     useOutletContext<OutletContext>();
+
   const hasFetchedUsers = useRef(false);
-  const loggedUserId = useAppSelector((state) => state.auth.user?.id);
-  const tabValue = searchParams.get('tab') === 'who-to-follow' ? 1 : 0;
 
   useEffect(() => {
     if (!isFollowingLoaded || hasFetchedUsers.current) return;
 
     getUserList()
       .then((data) => {
-        const currentFollowing = new Set(followingList.map((id) => String(id)));
+        setUsers(data);
 
-        const filteredUsers = data.filter(
+        const currentFollowing = new Set(followingList.map((id) => String(id)));
+        const notFollowedUsers = data.filter(
           (user: User) =>
             !currentFollowing.has(user.id) && user.id !== loggedUserId
         );
 
-        setUsers(filteredUsers);
+        setFollowSuggestions(notFollowedUsers);
         hasFetchedUsers.current = true;
       })
       .finally(() => setLoading(false));
@@ -81,10 +97,25 @@ export function Explore() {
     </Box>
   );
 
+  const filteredUsers = useMemo(() => {
+    const searchTerm = searchInput.toLowerCase().trim();
+    if (searchTerm === '') return [];
+
+    return users.filter(
+      (user) =>
+        user.name.toLowerCase().includes(searchTerm) ||
+        user.username.toLowerCase().includes(searchTerm)
+    );
+  }, [users, searchInput]);
+
   const handleTabChange = (_: React.SyntheticEvent, newValue: number) => {
-    setSearchParams(newValue === 1 ? { tab: 'who-to-follow' } : {}, {
-      replace: true
-    });
+    const tabMap: Record<number, string> = {
+      1: 'who-to-follow',
+      2: 'search'
+    };
+
+    const tabParam = tabMap[newValue];
+    setSearchParams(tabParam ? { tab: tabParam } : {}, { replace: true });
   };
 
   function accessibilityProps(index: number) {
@@ -140,13 +171,18 @@ export function Explore() {
           }}
         >
           <Tab
-            label={activeLabel('Para você', tabValue === 0)}
+            label={activeLabel('Em alta', tabValue === 0)}
             {...accessibilityProps(0)}
           />
 
           <Tab
-            label={activeLabel('Seguir', tabValue === 1)}
+            label={activeLabel('Sugestões', tabValue === 1)}
             {...accessibilityProps(1)}
+          />
+
+          <Tab
+            label={activeLabel('Buscar', tabValue === 2)}
+            {...accessibilityProps(2)}
           />
         </Tabs>
       </NavbarTop>
@@ -178,7 +214,7 @@ export function Explore() {
             >
               <CircularProgress size="14px" color="inherit" /> Carregando...
             </Typography>
-          ) : users.length === 0 ? (
+          ) : followSuggestions.length === 0 ? (
             <Typography
               variant="body2"
               color="text.secondary"
@@ -188,7 +224,44 @@ export function Explore() {
             </Typography>
           ) : (
             <UserList
-              users={users}
+              users={followSuggestions}
+              followingList={followingList}
+              setFollowingList={setFollowingList}
+            />
+          )}
+        </Stack>
+      </TabPanel>
+
+      <TabPanel value={tabValue} index={2} prefix="explore">
+        <Stack direction="column">
+          <Box sx={{ p: 1.5, pt: 2 }}>
+            <SearchInput value={searchInput} onValueChange={setSearchInput} />
+          </Box>
+
+          {loading ? (
+            <Typography
+              variant="body2"
+              sx={{
+                p: 1.5,
+                justifyContent: 'center',
+                display: 'flex',
+                alignItems: 'center',
+                gap: 0.75
+              }}
+            >
+              <CircularProgress size="14px" color="inherit" /> Carregando...
+            </Typography>
+          ) : filteredUsers.length === 0 ? (
+            <Typography
+              variant="body2"
+              color="text.secondary"
+              sx={{ p: 1.5, textAlign: 'center' }}
+            >
+              Nenhum usuário encontrado.
+            </Typography>
+          ) : (
+            <UserList
+              users={filteredUsers}
               followingList={followingList}
               setFollowingList={setFollowingList}
             />
