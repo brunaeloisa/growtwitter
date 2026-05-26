@@ -82,6 +82,7 @@ export function Explore() {
       {texto}
       <Box
         sx={{
+          display: { xs: 'none', sm: 'block' },
           position: 'absolute',
           bottom: '-7px',
           left: '50%',
