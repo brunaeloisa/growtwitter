@@ -1,11 +1,4 @@
-import {
-  Box,
-  Button,
-  CircularProgress,
-  Divider,
-  Stack,
-  Typography
-} from '@mui/material';
+import { Box, Button, Divider, Stack, Typography } from '@mui/material';
 import { useCallback, useEffect, useState } from 'react';
 import { fetchFeed } from '../../services/tweet.service';
 import { useAppSelector } from '../../store/hooks';
@@ -13,6 +6,28 @@ import type { Tweet } from '../../types/tweet.types';
 import { TweetThread } from '../../components/TweetThread';
 import { NavbarTop } from '../../components/NavbarTop';
 import { Link as RouterLink } from 'react-router-dom';
+import { StateView } from '../../components/StateView';
+
+const EmptyFeed = (
+  <Box sx={{ textAlign: 'center', p: 3 }}>
+    <Typography variant="body2" sx={{ mb: 2 }}>
+      Nada por aqui ainda. Siga pessoas para ver growtweets no seu feed!
+    </Typography>
+
+    <Button
+      component={RouterLink}
+      to="/explore?tab=who-to-follow"
+      variant="outlined"
+      sx={{
+        borderRadius: '20px',
+        textTransform: 'none',
+        fontWeight: '600'
+      }}
+    >
+      Encontrar pessoas
+    </Button>
+  </Box>
+);
 
 export function Home() {
   const { user } = useAppSelector((state) => state.auth);
@@ -51,56 +66,26 @@ export function Home() {
         </Box>
       </NavbarTop>
 
-      <Stack
-        divider={<Divider flexItem sx={{ borderBottomWidth: 1, my: 0 }} />}
+      <StateView
+        isLoading={loading && tweets.length === 0}
+        isEmpty={tweets.length === 0}
+        fallback={EmptyFeed}
       >
-        {loading && tweets.length === 0 ? (
-          <Typography
-            variant="body2"
-            sx={{
-              p: 2,
-              justifyContent: 'center',
-              display: 'flex',
-              alignItems: 'center',
-              gap: 0.75
-            }}
-          >
-            <CircularProgress size="14px" color="inherit" /> Carregando...
-          </Typography>
-        ) : tweets.length ? (
-          tweets.map((tweet) => (
+        <Stack
+          divider={<Divider flexItem sx={{ borderBottomWidth: 1, my: 0 }} />}
+        >
+          {tweets.map((tweet) => (
             <TweetThread
               key={tweet.id}
               tweet={tweet}
               onDelete={loadTweets}
               triggerRefresh={() => setFeedRefreshKey((prev) => prev + 1)}
             />
-          ))
-        ) : (
-          <Box sx={{ textAlign: 'center', p: 3 }}>
-            <Typography variant="body2" sx={{ mb: 2 }}>
-              Nada por aqui ainda. Siga pessoas para ver growtweets no seu feed!
-            </Typography>
+          ))}
+        </Stack>
 
-            <Button
-              component={RouterLink}
-              to="/explore?tab=who-to-follow"
-              variant="outlined"
-              sx={{
-                borderRadius: '20px',
-                textTransform: 'none',
-                fontWeight: '600'
-              }}
-            >
-              Encontrar pessoas
-            </Button>
-          </Box>
-        )}
-      </Stack>
-
-      {tweets.length > 0 && (
         <Divider flexItem sx={{ borderBottomWidth: 1, my: 0 }} />
-      )}
+      </StateView>
     </>
   );
 }

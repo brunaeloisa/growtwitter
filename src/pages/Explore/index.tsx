@@ -1,11 +1,4 @@
-import {
-  Box,
-  CircularProgress,
-  Stack,
-  Tab,
-  Tabs,
-  Typography
-} from '@mui/material';
+import { Box, Stack, Tab, Tabs, Typography } from '@mui/material';
 import { useEffect, useMemo, useRef, useState } from 'react';
 import {
   useLocation,
@@ -21,6 +14,7 @@ import { getUserList } from '../../services/user.service';
 import { useAppSelector } from '../../store/hooks';
 import type { User } from '../../types/user.types';
 import { SearchInput } from '../../components/SearchInput';
+import { StateView } from '../../components/StateView';
 
 interface OutletContext {
   followingList: string[];
@@ -151,9 +145,7 @@ export function Explore() {
           textColor="inherit"
           slotProps={{
             indicator: {
-              sx: {
-                display: { xs: 'flex', sm: 'none' }
-              }
+              sx: { display: { xs: 'flex', sm: 'none' } }
             }
           }}
           sx={{
@@ -163,12 +155,8 @@ export function Explore() {
             minHeight: '32px',
             height: '32px',
             '& .MuiTab-root': tabStyle,
-            '& .MuiTab-root:hover': {
-              bgcolor: 'background.paper'
-            },
-            '& .Mui-selected': {
-              color: 'text.primary'
-            }
+            '& .MuiTab-root:hover': { bgcolor: 'background.paper' },
+            '& .Mui-selected': { color: 'text.primary' }
           }}
         >
           <Tab
@@ -195,78 +183,46 @@ export function Explore() {
               key={topic.id}
               title={topic.title}
               category={topic.category}
-            ></TrendingTopic>
+            />
           ))}
         </Box>
       </TabPanel>
 
       <TabPanel value={tabValue} index={1} prefix="explore">
         <Stack direction="column">
-          {loading ? (
-            <Typography
-              variant="body2"
-              sx={{
-                p: 2,
-                justifyContent: 'center',
-                display: 'flex',
-                alignItems: 'center',
-                gap: 0.75
-              }}
-            >
-              <CircularProgress size="14px" color="inherit" /> Carregando...
-            </Typography>
-          ) : followSuggestions.length === 0 ? (
-            <Typography
-              variant="body2"
-              color="text.secondary"
-              sx={{ p: 2, textAlign: 'center' }}
-            >
-              Não há novos usuários para seguir no momento.
-            </Typography>
-          ) : (
+          <StateView
+            isLoading={loading}
+            isEmpty={followSuggestions.length === 0}
+            fallback={'Não há novos usuários para seguir no momento.'}
+          >
             <UserList
               users={followSuggestions}
               followingList={followingList}
               setFollowingList={setFollowingList}
             />
-          )}
+          </StateView>
         </Stack>
       </TabPanel>
 
       <TabPanel value={tabValue} index={2} prefix="explore">
         <Stack direction="column">
-          <Box sx={{ p: 1.5, pt: 2 }}>
+          <Box sx={{ px: 1.5, pt: 2, pb: 1 }}>
             <SearchInput value={searchInput} onValueChange={setSearchInput} />
           </Box>
 
-          {loading ? (
-            <Typography
-              variant="body2"
-              sx={{
-                p: 1.5,
-                justifyContent: 'center',
-                display: 'flex',
-                alignItems: 'center',
-                gap: 0.75
-              }}
-            >
-              <CircularProgress size="14px" color="inherit" /> Carregando...
-            </Typography>
-          ) : filteredUsers.length === 0 ? (
-            <Typography
-              variant="body2"
-              color="text.secondary"
-              sx={{ p: 1.5, textAlign: 'center' }}
-            >
-              Nenhum usuário encontrado.
-            </Typography>
-          ) : (
-            <UserList
-              users={filteredUsers}
-              followingList={followingList}
-              setFollowingList={setFollowingList}
-            />
-          )}
+          <StateView
+            isLoading={loading}
+            isEmpty={filteredUsers.length === 0}
+            fallback={'Nenhum usuário encontrado.'}
+          >
+            <Box sx={{ mt: 1 }}>
+              <UserList
+                users={filteredUsers}
+                followingList={followingList}
+                setFollowingList={setFollowingList}
+              />
+            </Box>
+          </StateView>
         </Stack>
       </TabPanel>
     </>

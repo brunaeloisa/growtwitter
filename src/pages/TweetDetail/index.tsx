@@ -1,12 +1,5 @@
 import KeyboardBackspaceIcon from '@mui/icons-material/KeyboardBackspace';
-import {
-  Box,
-  CircularProgress,
-  Divider,
-  IconButton,
-  Stack,
-  Typography
-} from '@mui/material';
+import { Box, Divider, IconButton, Stack, Typography } from '@mui/material';
 import { useCallback, useEffect, useState } from 'react';
 import { useNavigate, useParams, useSearchParams } from 'react-router-dom';
 import { NavbarTop } from '../../components/NavbarTop';
@@ -15,6 +8,7 @@ import type { Tweet } from '../../types/tweet.types';
 import { getTweetById } from '../../services/tweet.service';
 import { TweetThread } from '../../components/TweetThread';
 import { TweetCard } from '../../components/TweetCard';
+import { StateView } from '../../components/StateView';
 
 export function TweetDetail() {
   const loggedUser = useAppSelector((state) => state.auth.user);
@@ -94,69 +88,60 @@ export function TweetDetail() {
         </Stack>
       </NavbarTop>
 
-      {loading ? (
-        <Typography
-          variant="body2"
-          sx={{
-            p: 2,
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center',
-            gap: 0.75
-          }}
-        >
-          <CircularProgress size="1em" color="inherit" /> Carregando...
-        </Typography>
-      ) : !tweet ? (
-        <Typography variant="body2" sx={{ p: 2, textAlign: 'center' }}>
-          Growtweet não encontrado.
-        </Typography>
-      ) : (
-        <>
-          {replyId ? (
-            <Box>
-              <TweetThread
-                tweet={tweet}
-                onDelete={loadTweet}
-                onToggleLike={handleToggleLike}
-                triggerRefresh={() => setTweetRefreshKey((prev) => prev + 1)}
-                activeReplyId={replyId}
-              />
-            </Box>
-          ) : (
-            <Stack
-              divider={
-                <Divider flexItem sx={{ borderBottomWidth: 1, my: 0 }} />
-              }
-            >
-              <TweetCard
-                tweet={tweet}
-                triggerRefresh={() => setTweetRefreshKey((prev) => prev + 1)}
-                onDelete={loadTweet}
-                onToggleLike={handleToggleLike}
-                highlight={true}
-              />
-
-              {tweet.replies?.map((reply) => (
+      <StateView
+        isLoading={loading}
+        isEmpty={!tweet}
+        fallback={'Growtweet não encontrado.'}
+      >
+        {tweet && (
+          <>
+            {replyId ? (
+              <Box>
+                <TweetThread
+                  tweet={tweet}
+                  onDelete={loadTweet}
+                  onToggleLike={handleToggleLike}
+                  triggerRefresh={() => setTweetRefreshKey((prev) => prev + 1)}
+                  activeReplyId={replyId}
+                />
+              </Box>
+            ) : (
+              <Stack
+                divider={
+                  <Divider flexItem sx={{ borderBottomWidth: 1, my: 0 }} />
+                }
+              >
                 <TweetCard
-                  key={reply.id}
-                  tweet={reply}
+                  tweet={tweet}
                   triggerRefresh={() => setTweetRefreshKey((prev) => prev + 1)}
                   onDelete={loadTweet}
                   onToggleLike={handleToggleLike}
-                  replyTo={tweet.id}
-                  parentAuthor={{
-                    id: tweet.author.id,
-                    username: tweet.author.username
-                  }}
+                  highlight={true}
                 />
-              ))}
-            </Stack>
-          )}
 
-          <Divider flexItem sx={{ borderBottomWidth: 1, my: 0 }} />
-        </>
-      )}
+                {tweet.replies?.map((reply) => (
+                  <TweetCard
+                    key={reply.id}
+                    tweet={reply}
+                    triggerRefresh={() =>
+                      setTweetRefreshKey((prev) => prev + 1)
+                    }
+                    onDelete={loadTweet}
+                    onToggleLike={handleToggleLike}
+                    replyTo={tweet.id}
+                    parentAuthor={{
+                      id: tweet.author.id,
+                      username: tweet.author.username
+                    }}
+                  />
+                ))}
+              </Stack>
+            )}
+
+            <Divider flexItem sx={{ borderBottomWidth: 1, my: 0 }} />
+          </>
+        )}
+      </StateView>
     </>
   );
 }
