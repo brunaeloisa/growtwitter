@@ -4,8 +4,6 @@ import VisibilityOffIcon from '@mui/icons-material/VisibilityOff';
 import {
   Avatar,
   Box,
-  Button,
-  CircularProgress,
   IconButton,
   InputAdornment,
   Stack,
@@ -13,10 +11,11 @@ import {
 } from '@mui/material';
 import { useEffect, useState } from 'react';
 import { Navigate, useNavigate, useOutletContext } from 'react-router-dom';
-import type { AuthContextType } from '../../layouts/AuthLayout';
-import { useAppSelector } from '../../store/hooks';
-import { register } from '../../services/auth.service';
 import { CustomSnackbar } from '../../components/CustomSnackbar';
+import { SubmitButton } from '../../components/SubmitButton';
+import type { AuthContextType } from '../../layouts/AuthLayout';
+import { register } from '../../services/auth.service';
+import { useAppSelector } from '../../store/hooks';
 import type { ResponseRegister } from '../../types/auth.types';
 
 export function Register() {
@@ -141,9 +140,7 @@ export function Register() {
                   <IconButton
                     edge="end"
                     onMouseDown={(e) => e.preventDefault()}
-                    onClick={() => {
-                      setShowPassword((prev) => !prev);
-                    }}
+                    onClick={() => setShowPassword((prev) => !prev)}
                   >
                     {showPassword ? <VisibilityOffIcon /> : <VisibilityIcon />}
                   </IconButton>
@@ -187,27 +184,16 @@ export function Register() {
           />
         </Stack>
 
-        <Button
-          type="submit"
+        <SubmitButton
           fullWidth
-          variant="contained"
           size="large"
+          disabled={isFormInvalid}
+          isLoading={loading}
+          loadingLabel="Cadastrando..."
           sx={{ my: 2, borderRadius: 2, p: 1.25, fontSize: '1rem' }}
-          disabled={isFormInvalid || loading}
         >
-          {loading ? (
-            <>
-              <CircularProgress
-                size="1em"
-                color="inherit"
-                sx={{ verticalAlign: 'middle', mr: 1 }}
-              />
-              Cadastrando...
-            </>
-          ) : (
-            'Cadastrar'
-          )}
-        </Button>
+          Cadastrar
+        </SubmitButton>
       </Box>
 
       <CustomSnackbar

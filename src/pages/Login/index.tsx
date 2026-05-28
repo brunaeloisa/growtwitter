@@ -1,10 +1,11 @@
-import { Box, Button, CircularProgress, TextField } from '@mui/material';
+import { Box, TextField } from '@mui/material';
 import { useEffect, useState } from 'react';
+import { useLocation, useOutletContext } from 'react-router-dom';
 import { CustomSnackbar } from '../../components/CustomSnackbar';
+import { SubmitButton } from '../../components/SubmitButton';
+import type { AuthContextType } from '../../layouts/AuthLayout';
 import { loginThunk } from '../../store/auth/auth.thunk';
 import { useAppDispatch, useAppSelector } from '../../store/hooks';
-import type { AuthContextType } from '../../layouts/AuthLayout';
-import { useLocation, useOutletContext } from 'react-router-dom';
 
 export function Login() {
   const dispatch = useAppDispatch();
@@ -65,27 +66,16 @@ export function Login() {
           disabled={loading}
         />
 
-        <Button
-          type="submit"
+        <SubmitButton
           fullWidth
-          variant="contained"
           size="large"
+          disabled={!username || !password}
+          isLoading={loading}
+          loadingLabel="Entrando..."
           sx={{ my: 2, borderRadius: 2, p: 1.25, fontSize: '1rem' }}
-          disabled={!username || !password || loading}
         >
-          {loading ? (
-            <>
-              <CircularProgress
-                size="1em"
-                color="inherit"
-                sx={{ verticalAlign: 'middle', mr: 1 }}
-              />
-              Entrando...
-            </>
-          ) : (
-            'Entrar'
-          )}
-        </Button>
+          Entrar
+        </SubmitButton>
       </Box>
 
       <CustomSnackbar

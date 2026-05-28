@@ -1,15 +1,9 @@
-import {
-  Modal,
-  Box,
-  TextField,
-  Button,
-  IconButton,
-  CircularProgress
-} from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
+import { Box, IconButton, Modal, TextField } from '@mui/material';
 import { useState } from 'react';
 import { postReply, postTweet } from '../services/tweet.service';
 import { CustomSnackbar } from './CustomSnackbar';
+import { SubmitButton } from './SubmitButton';
 
 interface TweetModalProps {
   open: boolean;
@@ -34,7 +28,9 @@ export default function TweetModalButton({
     severity: 'success' as 'success' | 'error'
   });
 
-  async function handleTweet() {
+  async function handleTweet(e: React.SubmitEvent<HTMLFormElement>) {
+    e.preventDefault();
+
     if (!tweetContent.trim()) return;
 
     setLoading(true);
@@ -73,6 +69,8 @@ export default function TweetModalButton({
           aria-label={mode === 'REPLY' ? 'Responder Tweet' : 'Tweetar'}
         >
           <Box
+            component="form"
+            onSubmit={handleTweet}
             sx={{
               position: 'absolute',
               top: '50%',
@@ -104,24 +102,13 @@ export default function TweetModalButton({
             />
 
             <Box sx={{ display: 'flex', justifyContent: 'flex-end', mt: 2 }}>
-              <Button
-                variant="contained"
-                onClick={handleTweet}
-                disabled={!tweetContent.trim() || loading}
+              <SubmitButton
+                disabled={!tweetContent.trim()}
+                isLoading={loading}
+                loadingLabel="Tweetando..."
               >
-                {loading ? (
-                  <>
-                    <CircularProgress
-                      size="1em"
-                      color="inherit"
-                      sx={{ verticalAlign: 'middle', mr: 1 }}
-                    />
-                    Tweetando...
-                  </>
-                ) : (
-                  'Tweetar'
-                )}
-              </Button>
+                Tweetar
+              </SubmitButton>
             </Box>
           </Box>
         </Modal>
