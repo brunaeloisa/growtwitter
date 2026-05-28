@@ -22,6 +22,12 @@ interface OutletContext {
   isFollowingLoaded: boolean;
 }
 
+const EXPLORE_TABS = [
+  { id: 0, label: 'Em alta', param: '' },
+  { id: 1, label: 'Sugestões', param: 'who-to-follow' },
+  { id: 2, label: 'Buscar', param: 'search' }
+];
+
 const tabStyle = {
   fontSize: '12px',
   fontWeight: 700,
@@ -43,9 +49,8 @@ export function Explore() {
   const [followSuggestions, setFollowSuggestions] = useState<User[]>([]);
 
   const [searchParams, setSearchParams] = useSearchParams();
-  const tabParam = searchParams.get('tab');
-  const tabValue =
-    tabParam === 'who-to-follow' ? 1 : tabParam === 'search' ? 2 : 0;
+  const tabParam = searchParams.get('tab') ?? '';
+  const tabValue = EXPLORE_TABS.find((tab) => tab.param === tabParam)?.id ?? 0;
 
   const { followingList, setFollowingList, isFollowingLoaded } =
     useOutletContext<OutletContext>();
@@ -104,12 +109,7 @@ export function Explore() {
   }, [users, searchInput]);
 
   const handleTabChange = (_: React.SyntheticEvent, newValue: number) => {
-    const tabMap: Record<number, string> = {
-      1: 'who-to-follow',
-      2: 'search'
-    };
-
-    const tabParam = tabMap[newValue];
+    const tabParam = EXPLORE_TABS[newValue].param;
     setSearchParams(tabParam ? { tab: tabParam } : {}, { replace: true });
   };
 
@@ -159,20 +159,13 @@ export function Explore() {
             '& .Mui-selected': { color: 'text.primary' }
           }}
         >
-          <Tab
-            label={activeLabel('Em alta', tabValue === 0)}
-            {...accessibilityProps(0)}
-          />
-
-          <Tab
-            label={activeLabel('Sugestões', tabValue === 1)}
-            {...accessibilityProps(1)}
-          />
-
-          <Tab
-            label={activeLabel('Buscar', tabValue === 2)}
-            {...accessibilityProps(2)}
-          />
+          {EXPLORE_TABS.map((tab) => (
+            <Tab
+              key={tab.id}
+              label={activeLabel(tab.label, tabValue === tab.id)}
+              {...accessibilityProps(tab.id)}
+            />
+          ))}
         </Tabs>
       </NavbarTop>
 
